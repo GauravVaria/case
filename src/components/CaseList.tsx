@@ -251,7 +251,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   if (cases.length === 0) {
     return (
       <div style={emptyListStyles}>
-        <p>No cases added yet. Click "Add New Case" above to get started.</p>
+        <p>No cases added yet. Click Add New Case above to get started.</p>
       </div>
     );
   }
@@ -516,7 +516,6 @@ const caseDetailsCardStyles: React.CSSProperties = {
   marginBottom: "1.5rem",
   borderRadius: "0 0 8px 8px",
   border: '1px solid black',
-  borderTop: 'none',
   boxSizing: 'border-box',
   color: COLORS.DARK_TEXT,
 };
@@ -577,7 +576,6 @@ const installmentFormStyles: React.CSSProperties = {
   padding: "1rem",
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   borderRadius: "8px",
-  border: `1px dashed ${COLORS.INFO}`,
   color: COLORS.DARK_TEXT,
   border: '1px solid black',
 };
