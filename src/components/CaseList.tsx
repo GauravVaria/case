@@ -3,7 +3,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Case, Installment, Hearing, CourtVisit } from '@/types/case';
-import { COLORS } from '@/styles/colors';
+import { COLORS } from '@/styles/colors'; // Import color palette
 
 interface CaseListProps {
   cases: Case[];
@@ -434,20 +434,16 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   );
 }
 
-// =======================================================
-// Styles (New and Modified)
-// =======================================================
-
 const listContainerStyles: React.CSSProperties = {
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   padding: "2rem",
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  maxWidth: "1200px", // Increased max-width for the main table container
+  maxWidth: "1200px",
   margin: "2rem auto",
   color: COLORS.DARK_TEXT,
   width: "calc(100% - 4rem)",
-  border: '1px solid black', // Added border
+  border: '1px solid black',
 };
 
 const filterButtonsContainerStyles: React.CSSProperties = {
@@ -472,7 +468,7 @@ const caseTableStyles: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(7, minmax(100px, 1fr))',
   gap: '1px',
-  backgroundColor: 'black', // Border color for grid lines
+  backgroundColor: 'black',
   borderRadius: '8px',
   overflow: 'hidden',
 };
@@ -488,8 +484,8 @@ const tableHeaderRowStyles: React.CSSProperties = {
 const tableHeaderCellStyles: React.CSSProperties = {
   padding: '12px 10px',
   textAlign: 'left',
-  borderRight: '1px solid black', // Black border
-  borderBottom: '1px solid black', // Black border
+  borderRight: '1px solid black',
+  borderBottom: '1px solid black',
   backgroundColor: COLORS.PRIMARY_DARK,
   whiteSpace: 'nowrap',
 };
@@ -501,8 +497,8 @@ const tableRowStyles: React.CSSProperties = {
 
 const tableCellStyles: React.CSSProperties = {
   padding: '10px',
-  borderRight: '1px solid black', // Black border
-  borderBottom: '1px solid black', // Black border
+  borderRight: '1px solid black',
+  borderBottom: '1px solid black',
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   wordBreak: 'break-word',
   fontSize: '0.9em',
@@ -513,13 +509,13 @@ const tableCellStyles: React.CSSProperties = {
 
 const caseDetailsCardStyles: React.CSSProperties = {
   gridColumn: '1 / -1',
-  backgroundColor: COLORS.LIGHT_BACKGROUND, // Same as table row for continuity
+  backgroundColor: COLORS.LIGHT_BACKGROUND,
   padding: "1.5rem",
-  borderTop: '1px solid black', // Black border
+  borderTop: '1px solid black',
   marginBottom: "1.5rem",
   borderRadius: "0 0 8px 8px",
-  border: '1px solid black', // Black border around the details card itself
-  borderTop: 'none', // Remove top border if it's supposed to be continuous with the row
+  border: '1px solid black',
+  borderTop: 'none',
   boxSizing: 'border-box',
   color: COLORS.DARK_TEXT,
 };
@@ -533,7 +529,7 @@ const emptyListStyles: React.CSSProperties = {
   color: COLORS.DARK_TEXT,
   maxWidth: "600px",
   margin: "2rem auto",
-  border: '1px solid black', // Added border
+  border: '1px solid black',
 };
 
 const sortControlsStyles: React.CSSProperties = {
@@ -572,7 +568,7 @@ const installmentItemStyles: React.CSSProperties = {
   flexWrap: 'wrap',
   gap: '10px',
   color: COLORS.LIGHT_TEXT,
-  border: '1px solid black', // Added border
+  border: '1px solid black',
 };
 
 const installmentFormStyles: React.CSSProperties = {
@@ -582,7 +578,7 @@ const installmentFormStyles: React.CSSProperties = {
   borderRadius: "8px",
   border: `1px dashed ${COLORS.INFO}`,
   color: COLORS.DARK_TEXT,
-  border: '1px solid black', // Added border
+  border: '1px solid black',
 };
 
 const inputGroupStyles: React.CSSProperties = {
