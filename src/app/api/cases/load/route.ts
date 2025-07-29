@@ -29,19 +29,23 @@ export async function GET(req: Request) {
 
     let fileContent = '';
     await new Promise<void>((resolve, reject) => {
-      // Changed 'chunk: any' to 'chunk: Buffer' for data event
       res.data
         .on('data', (chunk: Buffer) => (fileContent += chunk.toString()))
-        // Changed 'err: any' to 'err: Error' for error event
-        .on('error', (err: Error) => reject(err))
-        .on('end', () => resolve());
+        .on('end', () => resolve())
+        .on('error', (err: unknown) => { // Changed type to unknown
+          if (err instanceof Error) { // Type assertion for safety
+            reject(err);
+          } else {
+            reject(new Error(String(err)));
+          }
+        });
     });
 
     const cases: Case[] = JSON.parse(fileContent);
     return NextResponse.json(cases, { status: 200 });
 
-  } catch (error: any) { // Keep `any` here for broader error catching, or make more specific if possible
-    console.error('Failed to load cases from Google Drive:', error.message, error.stack);
-    return NextResponse.json({ message: 'Failed to load cases', error: error.message }, { status: 500 });
+  } catch (error: unknown) { // Changed type to unknown
+    console.error('Failed to load cases from Google Drive:', error instanceof Error ? error.message : String(error), error instanceof Error ? error.stack : '');
+    return NextResponse.json({ message: 'Failed to load cases', error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

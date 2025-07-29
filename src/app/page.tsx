@@ -140,7 +140,7 @@ export default function HomePage() {
 
   if (status === "loading" || loadingCases) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: COLORS.LIGHT_BACKGROUND, color: COLORS.DARK_TEXT }}> {/* Updated background/text */}
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: COLORS.LIGHT_BACKGROUND, color: COLORS.DARK_TEXT }}>
         <p>Loading application data...</p>
       </div>
     );
@@ -154,15 +154,21 @@ export default function HomePage() {
         style={{
           flexGrow: 1,
           padding: "20px",
-          backgroundColor: COLORS.LIGHT_BACKGROUND, // Main content background
-          color: COLORS.DARK_TEXT, // Main content text
+          backgroundColor: COLORS.LIGHT_BACKGROUND,
+          color: COLORS.DARK_TEXT,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: "30px",
+          border: '1px solid black',
+          borderRadius: '8px',
+          margin: '20px auto',
+          maxWidth: '1200px',
+          width: 'calc(100% - 40px)',
+          boxSizing: 'border-box',
         }}
       >
-        <h1 style={{ color: COLORS.PRIMARY_DARK, textAlign: "center", marginBottom: "1.5rem" }}> {/* Heading color */}
+        <h1 style={{ color: COLORS.PRIMARY_DARK, textAlign: "center", marginBottom: "1.5rem" }}>
           Case Management Dashboard
         </h1>
 
@@ -183,7 +189,7 @@ export default function HomePage() {
                     disabled={saveStatus === 'saving'}
                     style={{
                         padding: "10px 20px",
-                        backgroundColor: saveStatus === 'saved' ? COLORS.SUCCESS : saveStatus === 'saving' ? COLORS.WARNING : COLORS.SECONDARY_ACCENT, // Save button colors
+                        backgroundColor: saveStatus === 'saved' ? COLORS.SUCCESS : saveStatus === 'saving' ? COLORS.WARNING : COLORS.SECONDARY_ACCENT,
                         color: COLORS.LIGHT_TEXT,
                         border: "none",
                         borderRadius: "5px",
@@ -196,14 +202,14 @@ export default function HomePage() {
                 >
                     {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save Cases to Drive'}
                 </button>
-                {saveStatus === 'error' && <span style={{color: COLORS.DANGER, marginLeft: '10px'}}>Save Error!</span>} {/* Error text color */}
+                {saveStatus === 'error' && <span style={{color: COLORS.DANGER, marginLeft: '10px'}}>Save Error!</span>}
 
             </div>
 
 
             {showCaseForm && (
                 <div style={modalOverlayStyles}>
-                    <div style={modalContentStyles}>
+                    <div style={{ ...modalContentStyles, border: '1px solid black' }}>
                         <CaseForm
                             onAddCase={handleAddCase}
                             onUpdateCase={handleUpdateCase}
@@ -224,13 +230,13 @@ export default function HomePage() {
             )}
           </>
         ) : (
-          <div style={{ textAlign: "center", marginTop: "50px" }}>
-            <p style={{ color: COLORS.DARK_TEXT }}>Please sign in with your Google account to access the Case Management System.</p> {/* Text color */}
+          <div style={{ textAlign: "center", marginTop: "50px", border: '1px solid black', padding: '20px', borderRadius: '8px', backgroundColor: COLORS.LIGHT_BACKGROUND, maxWidth: '600px' }}>
+            <p style={{ color: COLORS.DARK_TEXT }}>Please sign in with your Google account to access the Case Management System.</p>
             <button
               onClick={() => signIn("google")}
               style={{
                 padding: "10px 20px",
-                backgroundColor: COLORS.PRIMARY_ACCENT, // Sign In button color
+                backgroundColor: COLORS.PRIMARY_ACCENT,
                 color: COLORS.LIGHT_TEXT,
                 border: "none",
                 borderRadius: "5px",
@@ -245,8 +251,8 @@ export default function HomePage() {
         )}
       </main>
 
-      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: COLORS.PRIMARY_DARK, color: COLORS.LIGHT_TEXT }}> {/* Footer colors */}
-        &copy; {new Date().getFullYear()} Lawyer's Case Tracker
+      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: COLORS.PRIMARY_DARK, color: COLORS.LIGHT_TEXT, borderTop: '1px solid black' }}>
+        &copy; {new Date().getFullYear()} Lawyer&apos;s Case Tracker
       </footer>
     </div>
   );
@@ -268,7 +274,7 @@ const modalOverlayStyles: React.CSSProperties = {
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.7)', // Remains dark for modal overlay
+  backgroundColor: 'rgba(0, 0, 0, 0.7)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -276,7 +282,7 @@ const modalOverlayStyles: React.CSSProperties = {
 };
 
 const modalContentStyles: React.CSSProperties = {
-  backgroundColor: COLORS.LIGHT_BACKGROUND, // Modal background
+  backgroundColor: COLORS.LIGHT_BACKGROUND,
   padding: '0',
   borderRadius: '8px',
   maxHeight: '90vh',
@@ -288,7 +294,7 @@ const modalContentStyles: React.CSSProperties = {
 
 const buttonStyles: React.CSSProperties = {
   padding: "12px 25px",
-  backgroundColor: COLORS.PRIMARY_ACCENT, // Default button style
+  backgroundColor: COLORS.PRIMARY_ACCENT,
   color: COLORS.LIGHT_TEXT,
   border: "none",
   borderRadius: "5px",

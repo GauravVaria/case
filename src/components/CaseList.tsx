@@ -17,24 +17,24 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [filterType, setFilterType] = useState<'all' | 'paid' | 'unpaid'>('all');
 
-  // Installment States - ENSURE ALL THESE ARE PRESENT
-  const [showInstallmentForm, setShowInstallmentForm] = useState<string | null>(null); // <-- THIS ONE
-  const [editingInstallmentId, setEditingInstallmentId] = useState<string | null>(null); // <-- AND THIS ONE
+  // Installment States
+  const [showInstallmentForm, setShowInstallmentForm] = useState<string | null>(null);
+  const [editingInstallmentId, setEditingInstallmentId] = useState<string | null>(null);
   const [currentInstallmentInvoice, setCurrentInstallmentInvoice] = useState('');
   const [currentInstallmentDate, setCurrentInstallmentDate] = useState('');
   const [currentInstallmentAmount, setCurrentInstallmentAmount] = useState(0);
   const [currentInstallmentPaymentMethod, setCurrentInstallmentPaymentMethod] = useState<'cash' | 'upi' | 'other' | string>('cash');
   const [currentInstallmentCustomMethod, setCurrentInstallmentCustomMethod] = useState('');
 
-  // Hearing States - ENSURE ALL THESE ARE PRESENT
-  const [showHearingForm, setShowHearingForm] = useState<string | null>(null); // <-- AND THIS ONE
-  const [editingHearingId, setEditingHearingId] = useState<string | null>(null); // <-- AND THIS ONE
+  // Hearing States
+  const [showHearingForm, setShowHearingForm] = useState<string | null>(null);
+  const [editingHearingId, setEditingHearingId] = useState<string | null>(null);
   const [currentHearingDate, setCurrentHearingDate] = useState('');
   const [currentHearingRemark, setCurrentHearingRemark] = useState('');
 
-  // Court Visit States - ENSURE ALL THESE ARE PRESENT
-  const [showCourtVisitForm, setShowCourtVisitForm] = useState<string | null>(null); // <-- AND THIS ONE
-  const [editingCourtVisitId, setEditingCourtVisitId] = useState<string | null>(null); // <-- AND THIS ONE
+  // Court Visit States
+  const [showCourtVisitForm, setShowCourtVisitForm] = useState<string | null>(null);
+  const [editingCourtVisitId, setEditingCourtVisitId] = useState<string | null>(null);
   const [currentCourtVisitDate, setCurrentCourtVisitDate] = useState('');
   const [currentCourtVisitRemark, setCurrentCourtVisitRemark] = useState('');
 

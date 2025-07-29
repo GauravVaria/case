@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { getDriveClient, findFileByName } from '@/lib/googleDriveClient';
-import { Case, Installment, Hearing, CourtVisit } from '@/types/case';
+import { Case, Installment, Hearing, CourtVisit } from '@/types/case'; // CourtVisit is unused, but error is type `any` for error handling
 
 const CASE_FILE_NAME = 'my_lawyer_cases.json';
 const FOLDER_NAME = 'LawyerApp_CaseData';
@@ -38,8 +38,8 @@ export async function POST(req: Request) {
             });
             folderId = folderRes.data.id!;
         }
-    } catch (folderError: any) { // Keep `any` here for broader error catching, or make more specific if possible
-        console.error("Error finding or creating folder:", folderError.message);
+    } catch (folderError: unknown) { // Changed type to unknown
+        console.error("Error finding or creating folder:", folderError instanceof Error ? folderError.message : String(folderError));
         return NextResponse.json({ message: 'Error managing Google Drive folder' }, { status: 500 });
     }
 
@@ -48,8 +48,8 @@ export async function POST(req: Request) {
     let fileId: string | null = null;
     try {
       fileId = await findFileByName(drive, CASE_FILE_NAME);
-    } catch (findError: any) { // Keep `any` here for broader error catching
-      console.warn("Error finding file, attempting to create:", findError.message);
+    } catch (findError: unknown) { // Changed type to unknown
+      console.warn("Error finding file, attempting to create:", findError instanceof Error ? findError.message : String(findError));
     }
 
     if (fileId) {
@@ -79,8 +79,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Cases saved successfully to Google Drive', fileId: res.data.id });
     }
 
-  } catch (error: any) { // Keep `any` here for broader error catching
-    console.error('Failed to save cases to Google Drive:', error.message, error.stack);
-    return NextResponse.json({ message: 'Failed to save cases', error: error.message }, { status: 500 });
+  } catch (error: unknown) { // Changed type to unknown
+    console.error('Failed to save cases to Google Drive:', error instanceof Error ? error.message : String(error), error instanceof Error ? error.stack : '');
+    return NextResponse.json({ message: 'Failed to save cases', error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
