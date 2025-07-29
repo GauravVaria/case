@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { getDriveClient, findFileByName } from '@/lib/googleDriveClient';
 import { Case, Installment, Hearing, CourtVisit } from '@/types/case';
-import type { NextRequest } from 'next/server'; // IMPORT NextRequest
+import type { NextRequest } from 'next/server';
 
 const CASE_FILE_NAME = 'my_lawyer_cases.json';
 const FOLDER_NAME = 'LawyerApp_CaseData';
@@ -14,8 +14,7 @@ const calculateBalanceForCase = (quotation: number, initialInvoiceAmount: number
   return quotation - (initialInvoiceAmount + totalPaymentsReceived + totalHearingFees);
 };
 
-// Change req: Request to req: NextRequest
-export async function POST(req: NextRequest) { // <-- FIX IS HERE
+export async function POST(req: NextRequest) {
   try {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
@@ -49,15 +48,19 @@ export async function POST(req: NextRequest) { // <-- FIX IS HERE
 
     let fileId: string | null = null;
     try {
-        // Find existing file ID, but also ensure it's in the correct folder (optional, for strictness)
         const filesRes = await drive.files.list({
             q: `name='${CASE_FILE_NAME}' and trashed=false and '${folderId}' in parents`,
             fields: 'files(id)',
             spaces: 'drive',
         });
-        fileId = filesRes.data.files && filesRes.data.files.length > 0 ? filesRes.data.files[0].id : null;
+        // FIX IS HERE: Use nullish coalescing (?? null) or non-null assertion (!)
+        fileId = filesRes.data.files && filesRes.data.files.length > 0
+                 ? (filesRes.data.files[0].id ?? null) // Use ?? null to ensure it's either string or null
+                 : null;
+        // Alternatively, you could use a non-null assertion if you're certain:
+        // fileId = filesRes.data.files && filesRes.data.files.length > 0 ? filesRes.data.files[0].id! : null;
     } catch (findError: unknown) {
-        console.warn("Error finding file, attempting to create:", findError instanceof Error ? findError.message : String(findError));
+        console.warn("Error finding file during import, attempting to create:", findError instanceof Error ? findError.message : String(findError));
     }
 
     if (fileId) {
