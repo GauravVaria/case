@@ -5,6 +5,9 @@ import { getDriveClient, findFileByName } from '@/lib/googleDriveClient';
 import { Case } from '@/types/case';
 import type { NextRequest } from 'next/server'; // IMPORT NextRequest
 
+const CASE_FILE_NAME = 'my_lawyer_cases.json';
+const FOLDER_NAME = 'LawyerApp_CaseData'; // Although not used directly here, good for consistency if future logic needs it.
+
 // Change req: Request to req: NextRequest
 export async function GET(req: NextRequest) { // <-- FIX IS HERE
   try {
