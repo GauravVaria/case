@@ -1,12 +1,13 @@
 // src/app/page.tsx
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import CaseForm from "@/components/CaseForm";
 import CaseList from "@/components/CaseList";
 import { Case, Installment, Hearing } from "@/types/case";
 import { useSession, signIn } from "next-auth/react";
+import { COLORS } from '@/styles/colors'; // Import color palette
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -38,7 +39,7 @@ export default function HomePage() {
                 balanceRemaining: calculateBalanceForCase(caseItem.quotation, caseItem.invoiceAmount, caseItem.installments || [], caseItem.hearings || [])
             }));
             setCases(casesWithRecalculatedBalance);
-            console.log("Cases loaded successfully."); // Log success
+            console.log("Cases loaded successfully.");
           } else {
             console.error("Failed to load cases:", response.statusText);
             alert("Failed to load cases from Google Drive. Please check console.");
@@ -68,7 +69,7 @@ export default function HomePage() {
     });
     setShowCaseForm(false);
     setCaseToEdit(undefined);
-    console.log("Case added locally."); // Log success
+    console.log("Case added locally.");
     setSaveStatus('idle');
   };
 
@@ -84,14 +85,14 @@ export default function HomePage() {
       });
       setShowCaseForm(false);
       setCaseToEdit(undefined);
-      console.log(`Case "${updatedCase.caseTitle}" updated locally.`); // Log success
+      console.log(`Case "${updatedCase.caseTitle}" updated locally.`);
       setSaveStatus('idle');
   };
 
   const handleRemoveCase = (caseId: string) => {
     if (confirm("Are you sure you want to remove this case permanently?")) {
       setCases(prevCases => prevCases.filter(caseItem => caseItem.id !== caseId));
-      console.log("Case removed locally."); // Log success
+      console.log("Case removed locally.");
       setSaveStatus('idle');
     }
   };
@@ -119,7 +120,7 @@ export default function HomePage() {
 
       if (response.ok) {
         setSaveStatus('saved');
-        console.log("Cases saved to Google Drive!"); // Log success
+        console.log("Cases saved to Google Drive!");
       } else if (response.status === 401) {
         setSaveStatus('error');
         alert("Unauthorized to save. Please sign in again.");
@@ -139,7 +140,7 @@ export default function HomePage() {
 
   if (status === "loading" || loadingCases) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "#222", color: "#eee" }}>
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: COLORS.LIGHT_BACKGROUND, color: COLORS.DARK_TEXT }}> {/* Updated background/text */}
         <p>Loading application data...</p>
       </div>
     );
@@ -153,15 +154,15 @@ export default function HomePage() {
         style={{
           flexGrow: 1,
           padding: "20px",
-          backgroundColor: "#222",
-          color: "#eee",
+          backgroundColor: COLORS.LIGHT_BACKGROUND, // Main content background
+          color: COLORS.DARK_TEXT, // Main content text
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: "30px",
         }}
       >
-        <h1 style={{ color: "#61afef", textAlign: "center", marginBottom: "1.5rem" }}>
+        <h1 style={{ color: COLORS.PRIMARY_DARK, textAlign: "center", marginBottom: "1.5rem" }}> {/* Heading color */}
           Case Management Dashboard
         </h1>
 
@@ -173,7 +174,7 @@ export default function HomePage() {
                         setShowCaseForm(true);
                         setCaseToEdit(undefined);
                     }}
-                    style={{ ...buttonStyles, backgroundColor: '#28a745', width: 'auto', marginTop: 0, marginBottom: 0 }}
+                    style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, width: 'auto', marginTop: 0, marginBottom: 0 }}
                 >
                     Add New Case
                 </button>
@@ -182,8 +183,8 @@ export default function HomePage() {
                     disabled={saveStatus === 'saving'}
                     style={{
                         padding: "10px 20px",
-                        backgroundColor: saveStatus === 'saved' ? '#28a745' : saveStatus === 'saving' ? '#ffc107' : '#17a2b8',
-                        color: "white",
+                        backgroundColor: saveStatus === 'saved' ? COLORS.SUCCESS : saveStatus === 'saving' ? COLORS.WARNING : COLORS.SECONDARY_ACCENT, // Save button colors
+                        color: COLORS.LIGHT_TEXT,
                         border: "none",
                         borderRadius: "5px",
                         cursor: saveStatus === 'saving' ? 'not-allowed' : 'pointer',
@@ -195,7 +196,7 @@ export default function HomePage() {
                 >
                     {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save Cases to Drive'}
                 </button>
-                {saveStatus === 'error' && <span style={{color: '#e06c75', marginLeft: '10px'}}>Save Error!</span>}
+                {saveStatus === 'error' && <span style={{color: COLORS.DANGER, marginLeft: '10px'}}>Save Error!</span>} {/* Error text color */}
 
             </div>
 
@@ -224,13 +225,13 @@ export default function HomePage() {
           </>
         ) : (
           <div style={{ textAlign: "center", marginTop: "50px" }}>
-            <p>Please sign in with your Google account to access the Case Management System.</p>
+            <p style={{ color: COLORS.DARK_TEXT }}>Please sign in with your Google account to access the Case Management System.</p> {/* Text color */}
             <button
               onClick={() => signIn("google")}
               style={{
                 padding: "10px 20px",
-                backgroundColor: "#007bff",
-                color: "white",
+                backgroundColor: COLORS.PRIMARY_ACCENT, // Sign In button color
+                color: COLORS.LIGHT_TEXT,
                 border: "none",
                 borderRadius: "5px",
                 cursor: "pointer",
@@ -244,7 +245,7 @@ export default function HomePage() {
         )}
       </main>
 
-      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: '#333', color: '#888' }}>
+      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: COLORS.PRIMARY_DARK, color: COLORS.LIGHT_TEXT }}> {/* Footer colors */}
         &copy; {new Date().getFullYear()} Lawyer's Case Tracker
       </footer>
     </div>
@@ -267,7 +268,7 @@ const modalOverlayStyles: React.CSSProperties = {
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  backgroundColor: 'rgba(0, 0, 0, 0.7)', // Remains dark for modal overlay
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -275,7 +276,7 @@ const modalOverlayStyles: React.CSSProperties = {
 };
 
 const modalContentStyles: React.CSSProperties = {
-  backgroundColor: '#222',
+  backgroundColor: COLORS.LIGHT_BACKGROUND, // Modal background
   padding: '0',
   borderRadius: '8px',
   maxHeight: '90vh',
@@ -287,8 +288,8 @@ const modalContentStyles: React.CSSProperties = {
 
 const buttonStyles: React.CSSProperties = {
   padding: "12px 25px",
-  backgroundColor: "#98c379",
-  color: "white",
+  backgroundColor: COLORS.PRIMARY_ACCENT, // Default button style
+  color: COLORS.LIGHT_TEXT,
   border: "none",
   borderRadius: "5px",
   cursor: "pointer",

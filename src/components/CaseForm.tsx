@@ -2,7 +2,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Case, Installment, Hearing, CourtVisit } from "@/types/case"; // Import CourtVisit type
+import { Case, Installment, Hearing, CourtVisit } from "@/types/case";
+import { COLORS } from '@/styles/colors'; // Import color palette
 
 interface CaseFormProps {
   onAddCase: (newCase: Case) => void;
@@ -51,7 +52,6 @@ export default function CaseForm({ onAddCase, onUpdateCase, initialCase, onCance
   const [reference, setReference] = useState(initialCase?.reference || "");
   const [tdsApplicable, setTdsApplicable] = useState(initialCase?.tdsApplicable || false);
 
-  // Helper function to calculate balance (moved to HomePage for consistency)
   const calculateBalance = (quotationVal: number, initialInvAmt: number, installments: Installment[], hearings: Hearing[]) => {
     const totalInstallments = (installments || []).reduce((sum, inst) => sum + inst.amount, 0) || 0;
     const totalHearingFees = (hearings || []).reduce((sum, hearing) => sum + hearing.feesCharged, 0) || 0;
@@ -134,7 +134,7 @@ export default function CaseForm({ onAddCase, onUpdateCase, initialCase, onCance
       invoiceAmount: Number(invoiceAmount),
       installments: initialCase?.installments || [],
       hearings: initialCase?.hearings || [],
-      courtVisits: initialCase?.courtVisits || [], // NEW: Initialize courtVisits array
+      courtVisits: initialCase?.courtVisits || [],
       remark,
       reference,
       tdsApplicable,
@@ -159,7 +159,7 @@ export default function CaseForm({ onAddCase, onUpdateCase, initialCase, onCance
 
   return (
     <form onSubmit={handleSubmit} style={formContainerStyles}>
-      <h2 style={{ color: "#c678dd", marginBottom: "1.5rem" }}>{initialCase ? "Edit Case Details" : "Add New Case"}</h2>
+      <h2 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "1.5rem" }}>{initialCase ? "Edit Case Details" : "Add New Case"}</h2>
 
       <div style={twoColumnLayoutStyles}>
 
@@ -343,7 +343,7 @@ export default function CaseForm({ onAddCase, onUpdateCase, initialCase, onCance
         <button type="submit" style={buttonStyles}>
           {initialCase ? "Update Case" : "Add Case"}
         </button>
-        <button type="button" onClick={onCancel} style={{ ...buttonStyles, backgroundColor: '#6c757d' }}>
+        <button type="button" onClick={onCancel} style={{ ...buttonStyles, backgroundColor: COLORS.NEUTRAL_LIGHT }}>
           Cancel
         </button>
       </div>
@@ -352,19 +352,20 @@ export default function CaseForm({ onAddCase, onUpdateCase, initialCase, onCance
 }
 
 // =======================================================
-// Styles (slightly modified formContainerStyles and new formButtonRowStyles)
+// Styles (using COLORS)
 // =======================================================
 
 const formContainerStyles: React.CSSProperties = {
-  backgroundColor: "#282c34",
+  backgroundColor: COLORS.LIGHT_BACKGROUND, // Form background
   padding: "2rem",
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
   maxWidth: "900px",
   margin: "2rem auto",
-  color: "#abb2bf",
+  color: COLORS.DARK_TEXT, // Form text color
   width: "calc(100% - 4rem)",
-  boxSizing: 'border-box', // Ensure padding is included in width
+  boxSizing: 'border-box',
+  border: '1px solid black', // Added border
 };
 
 const twoColumnLayoutStyles: React.CSSProperties = {
@@ -384,7 +385,6 @@ const responsiveInputGroupStyles: React.CSSProperties = {
   marginBottom: '0',
 };
 
-
 const inputGroupStyles: React.CSSProperties = {
   marginBottom: "1.2rem",
   display: "flex",
@@ -394,16 +394,16 @@ const inputGroupStyles: React.CSSProperties = {
 
 const labelStyles: React.CSSProperties = {
   fontWeight: "bold",
-  color: "#61afef",
+  color: COLORS.PRIMARY_DARK, // Label color
   marginBottom: "5px",
 };
 
 const inputStyles: React.CSSProperties = {
   padding: "10px",
   borderRadius: "4px",
-  border: "1px solid #444",
-  backgroundColor: "#3a3f4b",
-  color: "#abb2bf",
+  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Border color
+  backgroundColor: COLORS.LIGHT_BACKGROUND, // Input background
+  color: COLORS.DARK_TEXT, // Input text color
   fontSize: "1em",
   width: '100%',
   boxSizing: 'border-box',
@@ -412,9 +412,9 @@ const inputStyles: React.CSSProperties = {
 const selectStyles: React.CSSProperties = {
   padding: "10px",
   borderRadius: "4px",
-  border: "1px solid #444",
-  backgroundColor: "#3a3f4b",
-  color: "#abb2bf",
+  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Border color
+  backgroundColor: COLORS.LIGHT_BACKGROUND, // Select background
+  color: COLORS.DARK_TEXT, // Select text color
   fontSize: "1em",
   cursor: "pointer",
   width: '100%',
@@ -423,14 +423,12 @@ const selectStyles: React.CSSProperties = {
 
 const buttonStyles: React.CSSProperties = {
   padding: "12px 25px",
-  backgroundColor: "#98c379",
-  color: "white",
+  backgroundColor: COLORS.PRIMARY_ACCENT, // Default button style
+  color: COLORS.LIGHT_TEXT,
   border: "none",
   borderRadius: "5px",
   cursor: "pointer",
   fontSize: "1.1em",
-  marginTop: "1.5rem",
-  width: "100%",
 };
 
 const formButtonRowStyles: React.CSSProperties = {
