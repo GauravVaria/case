@@ -2,9 +2,9 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { getDriveClient, findFileByName } from '@/lib/googleDriveClient';
-import { Case } from '@/types/case'; // Import your Case type
+import { Case } from '@/types/case';
 
-const CASE_FILE_NAME = 'my_lawyer_cases.json'; // Must match the file name used in save route
+const CASE_FILE_NAME = 'my_lawyer_cases.json';
 
 export async function GET(req: Request) {
   try {
@@ -19,11 +19,9 @@ export async function GET(req: Request) {
     const fileId = await findFileByName(drive, CASE_FILE_NAME);
 
     if (!fileId) {
-      // File does not exist, return empty array
       return NextResponse.json<Case[]>([], { status: 200 });
     }
 
-    // Download the file content
     const res = await drive.files.get(
       { fileId: fileId, alt: 'media' },
       { responseType: 'stream' }
@@ -31,16 +29,18 @@ export async function GET(req: Request) {
 
     let fileContent = '';
     await new Promise<void>((resolve, reject) => {
+      // Changed 'chunk: any' to 'chunk: Buffer' for data event
       res.data
         .on('data', (chunk: Buffer) => (fileContent += chunk.toString()))
-        .on('end', () => resolve())
-        .on('error', (err: any) => reject(err));
+        // Changed 'err: any' to 'err: Error' for error event
+        .on('error', (err: Error) => reject(err))
+        .on('end', () => resolve());
     });
 
     const cases: Case[] = JSON.parse(fileContent);
     return NextResponse.json(cases, { status: 200 });
 
-  } catch (error: any) {
+  } catch (error: any) { // Keep `any` here for broader error catching, or make more specific if possible
     console.error('Failed to load cases from Google Drive:', error.message, error.stack);
     return NextResponse.json({ message: 'Failed to load cases', error: error.message }, { status: 500 });
   }

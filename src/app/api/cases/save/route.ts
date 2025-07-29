@@ -2,12 +2,11 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { getDriveClient, findFileByName } from '@/lib/googleDriveClient';
-import { Case, Installment, Hearing, CourtVisit } from '@/types/case'; // Import all your types
+import { Case, Installment, Hearing, CourtVisit } from '@/types/case';
 
 const CASE_FILE_NAME = 'my_lawyer_cases.json';
 const FOLDER_NAME = 'LawyerApp_CaseData';
 
-// Helper to calculate balance (copied from HomePage/CaseList)
 const calculateBalanceForCase = (quotation: number, initialInvoiceAmount: number, installments: Installment[], hearings: Hearing[]): number => {
   const totalPaymentsReceived = (installments || []).reduce((sum, inst) => sum + inst.amount, 0) || 0;
   const totalHearingFees = (hearings || []).reduce((sum, hearing) => sum + hearing.feesCharged, 0) || 0;
@@ -23,7 +22,7 @@ export async function POST(req: Request) {
     }
 
     const { drive } = getDriveClient({ accessToken: token.accessToken as string });
-    const cases: Case[] = await req.json(); // Get the cases from the request body
+    const cases: Case[] = await req.json();
 
     let folderId: string | null = null;
     try {
@@ -39,29 +38,24 @@ export async function POST(req: Request) {
             });
             folderId = folderRes.data.id!;
         }
-    } catch (folderError: any) {
+    } catch (folderError: any) { // Keep `any` here for broader error catching, or make more specific if possible
         console.error("Error finding or creating folder:", folderError.message);
         return NextResponse.json({ message: 'Error managing Google Drive folder' }, { status: 500 });
     }
 
-    const fileContent = JSON.stringify(cases, null, 2); // Pretty print JSON
+    const fileContent = JSON.stringify(cases, null, 2);
 
     let fileId: string | null = null;
     try {
       fileId = await findFileByName(drive, CASE_FILE_NAME);
-    } catch (findError: any) {
+    } catch (findError: any) { // Keep `any` here for broader error catching
       console.warn("Error finding file, attempting to create:", findError.message);
     }
 
-
     if (fileId) {
-      // Update existing file - MODIFIED HERE
       await drive.files.update({
         fileId: fileId,
-        // Remove 'parents' from requestBody, use addParents/removeParents instead
-        // requestBody: fileMetadata, // This line is no longer correct.
-        addParents: folderId!, // Add the folder ID where the file should be (or already is)
-        // removeParents: 'old-parent-id', // Only if you are actually moving the file
+        addParents: folderId!,
         media: {
           mimeType: 'application/json',
           body: fileContent,
@@ -69,8 +63,7 @@ export async function POST(req: Request) {
       });
       return NextResponse.json({ message: 'Cases updated successfully in Google Drive', fileId });
     } else {
-      // Create new file (this part was already correct)
-      const fileMetadata = { // Define fileMetadata here for create operation
+      const fileMetadata = {
         name: CASE_FILE_NAME,
         mimeType: 'application/json',
         parents: [folderId!],
@@ -86,7 +79,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Cases saved successfully to Google Drive', fileId: res.data.id });
     }
 
-  } catch (error: any) {
+  } catch (error: any) { // Keep `any` here for broader error catching
     console.error('Failed to save cases to Google Drive:', error.message, error.stack);
     return NextResponse.json({ message: 'Failed to save cases', error: error.message }, { status: 500 });
   }

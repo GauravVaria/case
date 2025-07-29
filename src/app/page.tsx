@@ -1,12 +1,12 @@
 // src/app/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import CaseForm from "@/components/CaseForm";
 import CaseList from "@/components/CaseList";
-import { Case, Installment, Hearing, CourtVisit } from "@/types/case"; // Import CourtVisit type
-import { useSession } from "next-auth/react";
+import { Case, Installment, Hearing } from "@/types/case";
+import { useSession, signIn } from "next-auth/react";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -16,14 +16,12 @@ export default function HomePage() {
   const [showCaseForm, setShowCaseForm] = useState(false);
   const [caseToEdit, setCaseToEdit] = useState<Case | undefined>(undefined);
 
-  // Helper function to calculate balance for a case
   const calculateBalanceForCase = (quotation: number, initialInvoiceAmount: number, installments: Installment[], hearings: Hearing[]) => {
     const totalPaymentsReceived = (installments || []).reduce((sum, inst) => sum + inst.amount, 0) || 0;
     const totalHearingFees = (hearings || []).reduce((sum, hearing) => sum + hearing.feesCharged, 0) || 0;
     return quotation - (initialInvoiceAmount + totalPaymentsReceived + totalHearingFees);
   };
 
-  // Load cases when session is ready
   useEffect(() => {
     const loadCases = async () => {
       if (status === "authenticated") {
@@ -36,11 +34,11 @@ export default function HomePage() {
                 ...caseItem,
                 hearings: caseItem.hearings || [],
                 installments: caseItem.installments || [],
-                courtVisits: caseItem.courtVisits || [], // NEW: Ensure courtVisits is an array
+                courtVisits: caseItem.courtVisits || [],
                 balanceRemaining: calculateBalanceForCase(caseItem.quotation, caseItem.invoiceAmount, caseItem.installments || [], caseItem.hearings || [])
             }));
             setCases(casesWithRecalculatedBalance);
-            console.log("Cases loaded:", casesWithRecalculatedBalance);
+            console.log("Cases loaded successfully."); // Log success
           } else {
             console.error("Failed to load cases:", response.statusText);
             alert("Failed to load cases from Google Drive. Please check console.");
@@ -70,7 +68,7 @@ export default function HomePage() {
     });
     setShowCaseForm(false);
     setCaseToEdit(undefined);
-    alert("Case added locally. Remember to save to Google Drive!");
+    console.log("Case added locally."); // Log success
     setSaveStatus('idle');
   };
 
@@ -86,14 +84,14 @@ export default function HomePage() {
       });
       setShowCaseForm(false);
       setCaseToEdit(undefined);
-      alert(`Case "${updatedCase.caseTitle}" updated locally. Remember to save to Google Drive!`);
+      console.log(`Case "${updatedCase.caseTitle}" updated locally.`); // Log success
       setSaveStatus('idle');
   };
 
   const handleRemoveCase = (caseId: string) => {
     if (confirm("Are you sure you want to remove this case permanently?")) {
       setCases(prevCases => prevCases.filter(caseItem => caseItem.id !== caseId));
-      alert("Case removed locally. Remember to save to Google Drive!");
+      console.log("Case removed locally."); // Log success
       setSaveStatus('idle');
     }
   };
@@ -121,7 +119,7 @@ export default function HomePage() {
 
       if (response.ok) {
         setSaveStatus('saved');
-        alert("Cases saved to Google Drive!");
+        console.log("Cases saved to Google Drive!"); // Log success
       } else if (response.status === 401) {
         setSaveStatus('error');
         alert("Unauthorized to save. Please sign in again.");
@@ -198,6 +196,7 @@ export default function HomePage() {
                     {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save Cases to Drive'}
                 </button>
                 {saveStatus === 'error' && <span style={{color: '#e06c75', marginLeft: '10px'}}>Save Error!</span>}
+
             </div>
 
 
@@ -246,22 +245,20 @@ export default function HomePage() {
       </main>
 
       <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: '#333', color: '#888' }}>
-        &copy; {new Date().getFullYear()} Casemiro
+        &copy; {new Date().getFullYear()} Lawyer's Case Tracker
       </footer>
     </div>
   );
 }
 
-// =======================================================
-// New and Updated Styles for HomePage
-// =======================================================
 const topControlsContainerStyles: React.CSSProperties = {
     display: 'flex',
     gap: '20px',
-    justifyContent: 'center',
     marginBottom: '20px',
+    justifyContent: 'center',
     width: '100%',
-    maxWidth: '1200px', // Align with CaseList width
+    maxWidth: '1200px',
+    flexWrap: 'wrap',
 };
 
 const modalOverlayStyles: React.CSSProperties = {
@@ -279,16 +276,15 @@ const modalOverlayStyles: React.CSSProperties = {
 
 const modalContentStyles: React.CSSProperties = {
   backgroundColor: '#222',
-  padding: '0', // Form has its own padding
+  padding: '0',
   borderRadius: '8px',
   maxHeight: '90vh',
   overflowY: 'auto',
   boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
   width: 'calc(100% - 4rem)',
-  maxWidth: '900px', // Match form max-width
+  maxWidth: '900px',
 };
 
-// Re-using buttonStyles from CaseForm for consistency
 const buttonStyles: React.CSSProperties = {
   padding: "12px 25px",
   backgroundColor: "#98c379",
@@ -297,6 +293,4 @@ const buttonStyles: React.CSSProperties = {
   borderRadius: "5px",
   cursor: "pointer",
   fontSize: "1.1em",
-  marginTop: "1.5rem",
-  width: "100%",
 };

@@ -27,15 +27,15 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
 
   // Hearing States
   const [showHearingForm, setShowHearingForm] = useState<string | null>(null);
-  const [editingHearingId, setEditingHearingId] = useState<string | null>(null); // NEW for editing
-  const [currentHearingDate, setCurrentHearingDate] = useState(''); // Renamed for consistency
-  const [currentHearingRemark, setCurrentHearingRemark] = useState(''); // Renamed for consistency
+  const [editingHearingId, setEditingHearingId] = useState<string | null>(null);
+  const [currentHearingDate, setCurrentHearingDate] = useState('');
+  const [currentHearingRemark, setCurrentHearingRemark] = useState('');
 
   // Court Visit States
   const [showCourtVisitForm, setShowCourtVisitForm] = useState<string | null>(null);
-  const [editingCourtVisitId, setEditingCourtVisitId] = useState<string | null>(null); // NEW for editing
-  const [currentCourtVisitDate, setCurrentCourtVisitDate] = useState(''); // Renamed for consistency
-  const [currentCourtVisitRemark, setCurrentCourtVisitRemark] = useState(''); // Renamed for consistency
+  const [editingCourtVisitId, setEditingCourtVisitId] = useState<string | null>(null);
+  const [currentCourtVisitDate, setCurrentCourtVisitDate] = useState('');
+  const [currentCourtVisitRemark, setCurrentCourtVisitRemark] = useState('');
 
 
   const handleSort = (column: 'balanceRemaining' | 'dateCreated') => {
@@ -46,6 +46,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
       setSortOrder('asc');
     }
   };
+
 
   const calculateCaseBalance = (caseItem: Case) => {
     const safeInstallments = caseItem.installments || [];
@@ -78,6 +79,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     }
 
     let updatedInstallments: Installment[];
+
     if (editingInstallmentId) {
       updatedInstallments = (caseToUpdate.installments || []).map(inst =>
         inst.id === editingInstallmentId
@@ -91,7 +93,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
 
     const updatedCase: Case = { ...caseToUpdate, installments: updatedInstallments, balanceRemaining: calculateCaseBalance({ ...caseToUpdate, installments: updatedInstallments }) };
     onUpdateCase(updatedCase);
-    alert(`Installment ${editingInstallmentId ? 'updated' : 'added'} for case "${caseToUpdate.caseTitle}". Remember to save to Google Drive!`);
+    console.log(`Installment ${editingInstallmentId ? 'updated' : 'added'} for case "${caseToUpdate.caseTitle}".`); // Log success
     setShowInstallmentForm(null);
     resetInstallmentForm();
   };
@@ -110,7 +112,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     const updatedInstallments = (caseToUpdate.installments || []).filter(inst => inst.id !== installmentIdToRemove);
     const updatedCase: Case = { ...caseToUpdate, installments: updatedInstallments, balanceRemaining: calculateCaseBalance({ ...caseToUpdate, installments: updatedInstallments }) };
     onUpdateCase(updatedCase);
-    alert(`Installment removed from case "${caseToUpdate.caseTitle}". Remember to save to Google Drive!`);
+    console.log(`Installment removed from case "${caseToUpdate.caseTitle}".`); // Log success
     resetInstallmentForm();
     setShowInstallmentForm(null);
   };
@@ -121,13 +123,13 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   };
 
   // --- Hearing Logic ---
-  const resetHearingForm = () => { // NEW: Reset function
+  const resetHearingForm = () => {
     setEditingHearingId(null);
     setCurrentHearingDate('');
     setCurrentHearingRemark('');
   };
 
-  const handleAddOrUpdateHearing = (caseToUpdate: Case) => { // NEW: Unified handler
+  const handleAddOrUpdateHearing = (caseToUpdate: Case) => {
     if (!currentHearingDate) { alert("Please provide a date for the hearing."); return; }
     if (!caseToUpdate.perHearingFees || caseToUpdate.perHearingFees <= 0) { alert("Per hearing fees are not set or are zero for this case. Cannot add a hearing."); return; }
 
@@ -147,24 +149,24 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
 
     const updatedCase: Case = { ...caseToUpdate, hearings: updatedHearings, balanceRemaining: calculateCaseBalance({ ...caseToUpdate, hearings: updatedHearings }) };
     onUpdateCase(updatedCase);
-    alert(`Hearing ${editingHearingId ? 'updated' : 'added'} for case "${caseToUpdate.caseTitle}". Remember to save to Google Drive!`);
+    console.log(`Hearing ${editingHearingId ? 'updated' : 'added'} for case "${caseToUpdate.caseTitle}".`); // Log success
     setShowHearingForm(null);
     resetHearingForm();
   };
 
-  const handleEditHearing = (caseItem: Case, hearing: Hearing) => { // NEW: Edit function
+  const handleEditHearing = (caseItem: Case, hearing: Hearing) => {
     setShowHearingForm(caseItem.id);
     setEditingHearingId(hearing.id);
     setCurrentHearingDate(hearing.date);
     setCurrentHearingRemark(hearing.remark);
   };
 
-  const handleRemoveHearing = (caseToUpdate: Case, hearingIdToRemove: string) => { // NEW: Remove function
+  const handleRemoveHearing = (caseToUpdate: Case, hearingIdToRemove: string) => {
     if (!confirm("Are you sure you want to remove this hearing? This will affect the balance.")) return;
     const updatedHearings = (caseToUpdate.hearings || []).filter(hearing => hearing.id !== hearingIdToRemove);
     const updatedCase: Case = { ...caseToUpdate, hearings: updatedHearings, balanceRemaining: calculateCaseBalance({ ...caseToUpdate, hearings: updatedHearings }) };
     onUpdateCase(updatedCase);
-    alert(`Hearing removed from case "${caseToUpdate.caseTitle}". Remember to save to Google Drive!`);
+    console.log(`Hearing removed from case "${caseToUpdate.caseTitle}".`); // Log success
     resetHearingForm();
     setShowHearingForm(null);
   };
@@ -175,13 +177,13 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   };
 
   // --- Court Visit Logic ---
-  const resetCourtVisitForm = () => { // NEW: Reset function
+  const resetCourtVisitForm = () => {
     setEditingCourtVisitId(null);
     setCurrentCourtVisitDate('');
     setCurrentCourtVisitRemark('');
   };
 
-  const handleAddOrUpdateCourtVisit = (caseToUpdate: Case) => { // NEW: Unified handler
+  const handleAddOrUpdateCourtVisit = (caseToUpdate: Case) => {
     if (!currentCourtVisitDate) { alert("Please provide a date for the court visit."); return; }
 
     let updatedCourtVisits: CourtVisit[];
@@ -197,26 +199,26 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
       updatedCourtVisits = [...(caseToUpdate.courtVisits || []), newCourtVisit];
     }
 
-    const updatedCase: Case = { ...caseToUpdate, courtVisits: updatedCourtVisits }; // No balance recalculation for visits
+    const updatedCase: Case = { ...caseToUpdate, courtVisits: updatedCourtVisits };
     onUpdateCase(updatedCase);
-    alert(`Court Visit ${editingCourtVisitId ? 'updated' : 'added'} for case "${caseToUpdate.caseTitle}". Remember to save to Google Drive!`);
+    console.log(`Court Visit ${editingCourtVisitId ? 'updated' : 'added'} for case "${caseToUpdate.caseTitle}".`); // Log success
     setShowCourtVisitForm(null);
     resetCourtVisitForm();
   };
 
-  const handleEditCourtVisit = (caseItem: Case, visit: CourtVisit) => { // NEW: Edit function
+  const handleEditCourtVisit = (caseItem: Case, visit: CourtVisit) => {
     setShowCourtVisitForm(caseItem.id);
     setEditingCourtVisitId(visit.id);
     setCurrentCourtVisitDate(visit.date);
     setCurrentCourtVisitRemark(visit.remark);
   };
 
-  const handleRemoveCourtVisit = (caseToUpdate: Case, visitIdToRemove: string) => { // NEW: Remove function
+  const handleRemoveCourtVisit = (caseToUpdate: Case, visitIdToRemove: string) => {
     if (!confirm("Are you sure you want to remove this court visit?")) return;
     const updatedCourtVisits = (caseToUpdate.courtVisits || []).filter(visit => visit.id !== visitIdToRemove);
-    const updatedCase: Case = { ...caseToUpdate, courtVisits: updatedCourtVisits }; // No balance recalculation
+    const updatedCase: Case = { ...caseToUpdate, courtVisits: updatedCourtVisits };
     onUpdateCase(updatedCase);
-    alert(`Court Visit removed from case "${caseToUpdate.caseTitle}". Remember to save to Google Drive!`);
+    console.log(`Court Visit removed from case "${caseToUpdate.caseTitle}".`); // Log success
     resetCourtVisitForm();
     setShowCourtVisitForm(null);
   };
@@ -226,7 +228,6 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     resetCourtVisitForm();
   };
 
-  // --- Filtering and Sorting Logic ---
   const filteredCases = useMemo(() => {
     if (filterType === 'all') return cases;
     if (filterType === 'paid') return cases.filter(c => c.balanceRemaining <= 0);
@@ -367,7 +368,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
                         </ul>
                       )}
 
-                      <button onClick={() => { if (caseItem.id === showHearingForm) { handleCancelHearingForm(); } else { setShowHearingForm(caseItem.id); resetHearingForm(); setNewHearingDate(new Date().toISOString().split('T')[0]); setCurrentHearingRemark(''); } }}
+                      <button onClick={() => { if (caseItem.id === showHearingForm) { handleCancelHearingForm(); } else { setShowHearingForm(caseItem.id); resetHearingForm(); setCurrentHearingDate(new Date().toISOString().split('T')[0]); setCurrentHearingRemark(''); } }}
                         style={{ ...buttonStyles, backgroundColor: "#7c56b6c2", marginTop: "1rem" }}>
                         {caseItem.id === showHearingForm && editingHearingId ? 'Cancel Edit' : caseItem.id === showHearingForm ? 'Cancel Add Hearing' : 'Add Hearing'}
                       </button>
@@ -400,7 +401,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
                         </ul>
                       )}
 
-                      <button onClick={() => { if (caseItem.id === showCourtVisitForm) { handleCancelCourtVisitForm(); } else { setShowCourtVisitForm(caseItem.id); resetCourtVisitForm(); setNewCourtVisitDate(new Date().toISOString().split('T')[0]); setCurrentCourtVisitRemark(''); } }}
+                      <button onClick={() => { if (caseItem.id === showCourtVisitForm) { handleCancelCourtVisitForm(); } else { setShowCourtVisitForm(caseItem.id); resetCourtVisitForm(); setCurrentCourtVisitDate(new Date().toISOString().split('T')[0]); setCurrentCourtVisitRemark(''); } }}
                         style={{ ...buttonStyles, backgroundColor: "#ff8c00", marginTop: "1rem" }}>
                         {caseItem.id === showCourtVisitForm && editingCourtVisitId ? 'Cancel Edit' : caseItem.id === showCourtVisitForm ? 'Cancel Add Visit' : 'Add Court Visit'}
                       </button>
