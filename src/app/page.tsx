@@ -154,7 +154,7 @@ export default function HomePage() {
         style={{
           flexGrow: 1,
           padding: "20px",
-          backgroundColor: COLORS.LIGHT_BACKGROUND,
+          backgroundColor: COLORS.LIGHT_BACKGROUND, // Main content background is already this color
           color: COLORS.DARK_TEXT,
           display: "flex",
           flexDirection: "column",
@@ -251,8 +251,8 @@ export default function HomePage() {
         )}
       </main>
 
-      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: COLORS.PRIMARY_DARK, color: COLORS.LIGHT_TEXT, borderTop: '1px solid black' }}>
-        &copy; {new Date().getFullYear()} Lawyer&apos;s Case Tracker
+      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: COLORS.LIGHT_BACKGROUND, color: COLORS.DARK_TEXT, borderTop: '1px solid black' }}> {/* Changed to LIGHT_BACKGROUND and DARK_TEXT */}
+        &copy; {new Date().getFullYear()} Case Management System
       </footer>
     </div>
   );

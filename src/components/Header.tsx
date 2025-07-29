@@ -19,9 +19,9 @@ export default function Header() {
           justifyContent: "center",
           alignItems: "center",
           padding: "1rem",
-          backgroundColor: COLORS.PRIMARY_DARK,
-          color: COLORS.LIGHT_TEXT,
-          position: 'relative', // Needed for absolute positioning of right content
+          backgroundColor: COLORS.LIGHT_BACKGROUND, // Changed to LIGHT_BACKGROUND
+          color: COLORS.DARK_TEXT, // Changed to DARK_TEXT for visibility
+          position: 'relative',
         }}
       >
         <p>Loading...</p>
@@ -33,17 +33,16 @@ export default function Header() {
     <header
       style={{
         display: "flex",
-        justifyContent: "center", // This centers the direct children horizontally
+        justifyContent: "center",
         alignItems: "center",
         padding: "1rem 2rem",
-        backgroundColor: COLORS.PRIMARY_DARK,
-        color: COLORS.LIGHT_TEXT,
+        backgroundColor: COLORS.LIGHT_BACKGROUND, // Changed to LIGHT_BACKGROUND
+        color: COLORS.DARK_TEXT, // Changed to DARK_TEXT for visibility
         width: "100%",
         boxSizing: "border-box",
-        position: 'relative', // Set header to relative for absolute positioning of right content
+        position: 'relative',
       }}
     >
-      {/* Logo (This will now be truly centered by 'justifyContent: center' on the header) */}
       <Image
         src={logo}
         alt="V&V LAW ASSOCIATES Logo"
@@ -53,14 +52,13 @@ export default function Header() {
         style={{ objectFit: 'contain' }}
       />
 
-      {/* Sign-in/out buttons (Absolute positioned to the right) */}
       <div
         style={{
-          position: 'absolute', // Absolute positioning
-          right: '2rem', // Matches header's right padding
-          top: '50%', // Vertically center
-          transform: 'translateY(-50%)', // Adjust for vertical centering
-          display: 'flex', // Use flex for internal layout of buttons/image
+          position: 'absolute',
+          right: '2rem',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          display: 'flex',
           alignItems: 'center',
           gap: '10px',
         }}
@@ -83,7 +81,7 @@ export default function Header() {
               style={{
                 padding: "8px 15px",
                 backgroundColor: COLORS.DANGER,
-                color: COLORS.LIGHT_TEXT,
+                color: COLORS.LIGHT_TEXT, // Keep light text on danger button
                 border: "none",
                 borderRadius: "5px",
                 cursor: "pointer",
@@ -98,8 +96,8 @@ export default function Header() {
             onClick={() => signIn("google")}
             style={{
               padding: "8px 15px",
-              backgroundColor: COLORS.SECONDARY_ACCENT,
-              color: COLORS.LIGHT_TEXT,
+              backgroundColor: COLORS.PRIMARY_ACCENT, // Changed to Primary Accent for sign in on light background
+              color: COLORS.LIGHT_TEXT, // Keep light text on accent button
               border: "none",
               borderRadius: "5px",
               cursor: "pointer",
