@@ -273,7 +273,8 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
       </div>
 
       {displayedCases.length === 0 && (filterType !== 'all') ? (
-        <p style={{textAlign: 'center', marginTop: '20px', color: COLORS.DARK_TEXT}}>No {filterType} cases found matching your criteria.</p>
+        // FIX IS HERE: Changed double quotes to backticks for template literal
+        <p style={{textAlign: 'center', marginTop: '20px', color: COLORS.DARK_TEXT}}>{`No ${filterType} cases found matching your criteria.`}</p>
       ) : (
         <div style={caseTableStyles}>
           <div style={tableHeaderRowStyles}>
