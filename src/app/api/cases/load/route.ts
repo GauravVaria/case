@@ -3,10 +3,10 @@ import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { getDriveClient, findFileByName } from '@/lib/googleDriveClient';
 import { Case } from '@/types/case';
+import type { NextRequest } from 'next/server'; // IMPORT NextRequest
 
-const CASE_FILE_NAME = 'my_lawyer_cases.json';
-
-export async function GET(req: Request) {
+// Change req: Request to req: NextRequest
+export async function GET(req: NextRequest) { // <-- FIX IS HERE
   try {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
@@ -32,8 +32,8 @@ export async function GET(req: Request) {
       res.data
         .on('data', (chunk: Buffer) => (fileContent += chunk.toString()))
         .on('end', () => resolve())
-        .on('error', (err: unknown) => { // Changed type to unknown
-          if (err instanceof Error) { // Type assertion for safety
+        .on('error', (err: unknown) => {
+          if (err instanceof Error) {
             reject(err);
           } else {
             reject(new Error(String(err)));
@@ -44,7 +44,7 @@ export async function GET(req: Request) {
     const cases: Case[] = JSON.parse(fileContent);
     return NextResponse.json(cases, { status: 200 });
 
-  } catch (error: unknown) { // Changed type to unknown
+  } catch (error: unknown) {
     console.error('Failed to load cases from Google Drive:', error instanceof Error ? error.message : String(error), error instanceof Error ? error.stack : '');
     return NextResponse.json({ message: 'Failed to load cases', error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }

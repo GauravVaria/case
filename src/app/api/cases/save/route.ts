@@ -2,7 +2,8 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { getDriveClient, findFileByName } from '@/lib/googleDriveClient';
-import { Case, Installment, Hearing, CourtVisit } from '@/types/case'; // CourtVisit is unused, but error is type `any` for error handling
+import { Case, Installment, Hearing, CourtVisit } from '@/types/case';
+import type { NextRequest } from 'next/server'; // IMPORT NextRequest
 
 const CASE_FILE_NAME = 'my_lawyer_cases.json';
 const FOLDER_NAME = 'LawyerApp_CaseData';
@@ -13,7 +14,8 @@ const calculateBalanceForCase = (quotation: number, initialInvoiceAmount: number
   return quotation - (initialInvoiceAmount + totalPaymentsReceived + totalHearingFees);
 };
 
-export async function POST(req: Request) {
+// Change req: Request to req: NextRequest
+export async function POST(req: NextRequest) { // <-- FIX IS HERE
   try {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
             });
             folderId = folderRes.data.id!;
         }
-    } catch (folderError: unknown) { // Changed type to unknown
+    } catch (folderError: unknown) {
         console.error("Error finding or creating folder:", folderError instanceof Error ? folderError.message : String(folderError));
         return NextResponse.json({ message: 'Error managing Google Drive folder' }, { status: 500 });
     }
@@ -47,9 +49,15 @@ export async function POST(req: Request) {
 
     let fileId: string | null = null;
     try {
-      fileId = await findFileByName(drive, CASE_FILE_NAME);
-    } catch (findError: unknown) { // Changed type to unknown
-      console.warn("Error finding file, attempting to create:", findError instanceof Error ? findError.message : String(findError));
+        // Find existing file ID, but also ensure it's in the correct folder (optional, for strictness)
+        const filesRes = await drive.files.list({
+            q: `name='${CASE_FILE_NAME}' and trashed=false and '${folderId}' in parents`,
+            fields: 'files(id)',
+            spaces: 'drive',
+        });
+        fileId = filesRes.data.files && filesRes.data.files.length > 0 ? filesRes.data.files[0].id : null;
+    } catch (findError: unknown) {
+        console.warn("Error finding file, attempting to create:", findError instanceof Error ? findError.message : String(findError));
     }
 
     if (fileId) {
@@ -79,7 +87,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Cases saved successfully to Google Drive', fileId: res.data.id });
     }
 
-  } catch (error: unknown) { // Changed type to unknown
+  } catch (error: unknown) {
     console.error('Failed to save cases to Google Drive:', error instanceof Error ? error.message : String(error), error instanceof Error ? error.stack : '');
     return NextResponse.json({ message: 'Failed to save cases', error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
