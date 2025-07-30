@@ -13,6 +13,9 @@ interface CaseListProps {
 }
 
 export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase }: CaseListProps) {
+  // =======================================================
+  // 1. ALL STATE DECLARATIONS (useState) - TOP OF THE COMPONENT
+  // =======================================================
   const [sortBy, setSortBy] = useState<'balanceRemaining' | 'dateCreated' | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [filterType, setFilterType] = useState<'all' | 'paid' | 'unpaid'>('all');
@@ -40,15 +43,10 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   const [currentCourtVisitRemark, setCurrentCourtVisitRemark] = useState('');
 
 
-  const handleSort = (column: 'balanceRemaining' | 'dateCreated') => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortOrder('asc');
-    }
-  };
-
+  // =======================================================
+  // 2. ALL HANDLER FUNCTIONS (including utility functions like calculateBalance, reset forms)
+  //    These need to be defined AFTER states, but BEFORE useMemo or JSX.
+  // =======================================================
 
   const calculateCaseBalance = (caseItem: Case) => {
     const safeInstallments = caseItem.installments || [];
@@ -58,7 +56,21 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     return caseItem.quotation - (caseItem.invoiceAmount + totalPaymentsReceived + totalHearingFees);
   };
 
-  // --- Installment Logic ---
+  const handleSort = (column: 'balanceRemaining' | 'dateCreated') => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+  };
+
+  // NEW: Toggle details expansion
+  const toggleDetails = (caseId: string) => {
+    setExpandedCaseId(prevId => (prevId === caseId ? null : caseId));
+  };
+
+  // --- Installment Logic Functions ---
   const resetInstallmentForm = () => {
     setEditingInstallmentId(null);
     setCurrentInstallmentInvoice('');
@@ -124,7 +136,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     resetInstallmentForm();
   };
 
-  // --- Hearing Logic ---
+  // --- Hearing Logic Functions ---
   const resetHearingForm = () => {
     setEditingHearingId(null);
     setCurrentHearingDate('');
@@ -178,7 +190,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     resetHearingForm();
   };
 
-  // --- Court Visit Logic ---
+  // --- Court Visit Logic Functions ---
   const resetCourtVisitForm = () => {
     setEditingCourtVisitId(null);
     setCurrentCourtVisitDate('');
@@ -230,6 +242,10 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     resetCourtVisitForm();
   };
 
+
+  // =======================================================
+  // 3. ALL MEMOIZED VALUES (useMemo) - These use states/functions, so must be after them
+  // =======================================================
   const filteredCases = useMemo(() => {
     if (filterType === 'all') return cases;
     if (filterType === 'paid') return cases.filter(c => c.balanceRemaining <= 0);
@@ -248,20 +264,22 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     return sorted;
   }, [filteredCases, sortBy, sortOrder]);
 
+
   // =======================================================
-  // ALL STYLE DEFINITIONS ARE MOVED HERE (ABOVE THE RETURN STATEMENT)
+  // 4. ALL STYLE DEFINITIONS (const styleObject = { ... })
+  //    These must be defined before they are used in JSX.
   // =======================================================
 
   const listContainerStyles: React.CSSProperties = {
     backgroundColor: COLORS.LIGHT_BACKGROUND,
     padding: "2rem",
     borderRadius: "8px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    maxWidth: "1200px",
+    boxShadow: `0 4px 10px ${COLORS.SHADOW_DARK}`, // Added box shadow
+    maxWidth: "1200px", // Increased max-width for the main table container
     margin: "2rem auto",
     color: COLORS.DARK_TEXT,
     width: "calc(100% - 4rem)",
-    border: '1px solid black',
+    border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
   };
 
   const filterButtonsContainerStyles: React.CSSProperties = {
@@ -269,36 +287,39 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     gap: '10px',
     marginBottom: '1.5rem',
     justifyContent: 'center',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap', // Allow buttons to wrap
   };
 
   const filterButtonStyles = (isActive: boolean): React.CSSProperties => ({
-    padding: '10px 15px',
+    padding: '10px 15px', // Slightly less padding for mobile fit
     backgroundColor: isActive ? COLORS.PRIMARY_ACCENT : COLORS.NEUTRAL_LIGHT,
     color: isActive ? COLORS.DARK_TEXT : COLORS.LIGHT_TEXT,
-    border: '1px solid black',
+    border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Added border for visibility
     borderRadius: "5px",
     cursor: "pointer",
-    fontSize: '0.9em',
+    fontSize: '0.9em', // Slightly smaller font
     fontWeight: isActive ? 'bold' : 'normal',
-    flex: '1 1 auto',
-    minWidth: '90px',
-    boxSizing: 'border-box',
+    flex: '1 1 auto', // Allow flex items to grow/shrink based on content/space
+    minWidth: '90px', // Minimum width for each button
+    boxSizing: 'border-box', // Include padding and border in width calculation
+    boxShadow: `0 1px 3px ${COLORS.SHADOW_COLOR}`, // Added box shadow
   });
 
-  const caseTableContainerStyles: React.CSSProperties = {
+  const caseTableContainerStyles: React.CSSProperties = { // Wrapper for horizontal scroll
     width: '100%',
     overflowX: 'auto', // Enable horizontal scrolling
-    border: '1px solid black', // Border around the scrollable table
-    borderRadius: '8px',
+    border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+    borderRadius: "8px",
     marginBottom: '1.5rem', // Space below the table itself
+    boxShadow: `0 4px 10px ${COLORS.SHADOW_DARK}`, // Added box shadow
   };
 
   const caseTableStyles: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: 'repeat(7, minmax(120px, 1fr))', // Increased minmax for better column width on desktop
+    // On mobile, these minmax will push it beyond screen width, triggering overflow-x:auto
     gap: '1px',
-    backgroundColor: 'black', // Border color for grid lines
+    backgroundColor: COLORS.NEUTRAL_DARK, // Border color for grid lines (use a color from palette)
     // borderRadius: '8px', // Already on parent, no need here
     // overflow: 'hidden', // Already on parent
     minWidth: '700px', // Ensure the grid has a minimum width to always trigger scroll on small screens
@@ -315,8 +336,8 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   const tableHeaderCellStyles: React.CSSProperties = {
     padding: '12px 10px',
     textAlign: 'left',
-    borderRight: '1px solid black', // Black border
-    borderBottom: '1px solid black', // Black border
+    borderRight: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+    borderBottom: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
     backgroundColor: COLORS.PRIMARY_DARK,
     whiteSpace: 'nowrap',
   };
@@ -324,12 +345,13 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   const tableRowStyles: React.CSSProperties = {
     display: 'contents', // Allows children to be direct grid items
     backgroundColor: COLORS.LIGHT_BACKGROUND,
+    cursor: 'pointer', // Indicate clickable row
   };
 
   const tableCellStyles: React.CSSProperties = {
     padding: '10px',
-    borderRight: '1px solid black', // Black border
-    borderBottom: '1px solid black', // Black border
+    borderRight: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+    borderBottom: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
     backgroundColor: COLORS.LIGHT_BACKGROUND,
     wordBreak: 'break-word',
     fontSize: '0.9em',
@@ -342,12 +364,13 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     gridColumn: '1 / -1',
     backgroundColor: COLORS.LIGHT_BACKGROUND, // Same as table row for continuity
     padding: "1.5rem",
+    borderTop: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
     marginBottom: "1.5rem",
     borderRadius: "0 0 8px 8px",
-    border: '1px solid black', // Black border around the details card itself
-    borderTop: 'none', // Remove top border if it's supposed to be continuous with the row
+    border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
     boxSizing: 'border-box',
     color: COLORS.DARK_TEXT,
+    boxShadow: `0 4px 8px ${COLORS.SHADOW_COLOR}`, // Added box shadow
   };
 
 
@@ -359,7 +382,8 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     color: COLORS.DARK_TEXT,
     maxWidth: "600px",
     margin: "2rem auto",
-    border: '1px solid black',
+    border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+    boxShadow: `0 4px 12px ${COLORS.SHADOW_DARK}` // Subtle box shadow
   };
 
   const sortControlsStyles: React.CSSProperties = {
@@ -375,13 +399,14 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     padding: '8px 12px',
     backgroundColor: COLORS.SECONDARY_ACCENT,
     color: COLORS.LIGHT_TEXT,
-    border: '1px solid black',
+    border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
     borderRadius: "5px",
     cursor: "pointer",
     fontSize: '0.85em',
     flex: '1 1 auto',
     minWidth: '80px',
     boxSizing: 'border-box',
+    boxShadow: `0 1px 3px ${COLORS.SHADOW_COLOR}`, // Added box shadow
   };
 
   const installmentListStyles: React.CSSProperties = {
@@ -402,7 +427,8 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     flexWrap: 'wrap',
     gap: '10px',
     color: COLORS.LIGHT_TEXT,
-    border: '1px solid black',
+    border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+    boxShadow: `0 1px 3px ${COLORS.SHADOW_COLOR}`, // Added box shadow
   };
 
   const installmentFormStyles: React.CSSProperties = {
@@ -410,8 +436,9 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     padding: "1rem",
     backgroundColor: COLORS.LIGHT_BACKGROUND,
     borderRadius: "8px",
-    border: `1px dashed ${COLORS.INFO}`,
     color: COLORS.DARK_TEXT,
+    border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+    boxShadow: `0 4px 8px ${COLORS.SHADOW_COLOR}`, // Added box shadow
   };
 
   const inputGroupStyles: React.CSSProperties = {
@@ -422,15 +449,15 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   };
 
   const labelStyles: React.CSSProperties = {
-  fontWeight: "bold",
-  color: COLORS.PRIMARY_DARK,
-  fontSize: "0.9em",
+    fontWeight: "bold",
+    color: COLORS.PRIMARY_DARK,
+    fontSize: "0.9em",
   };
 
   const inputStyles: React.CSSProperties = {
     padding: "8px",
     borderRadius: "4px",
-    border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`,
+    border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Consistent thin border
     backgroundColor: COLORS.LIGHT_BACKGROUND,
     color: COLORS.DARK_TEXT,
     fontSize: "0.9em",
@@ -439,7 +466,7 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
   const selectStyles: React.CSSProperties = {
     padding: "8px",
     borderRadius: "4px",
-    border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`,
+    border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Consistent thin border
     backgroundColor: COLORS.LIGHT_BACKGROUND,
     color: COLORS.DARK_TEXT,
     fontSize: "0.9em",
@@ -465,35 +492,30 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
     fontSize: '0.8em',
   };
 
-  // =======================================================
-  // END OF STYLE DEFINITIONS
-  // =======================================================
-  if (cases.length === 0) {
-    return (
-      <div style={emptyListStyles}>
-        <p>{`No cases added yet. Click "Add New Case" above to get started.`}</p>
-      </div>
-    );
-  }
   return (
     <div style={listContainerStyles}>
+      {/* "All Cases" heading - Styled to look better */}
+      <h2 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "1.5rem", textAlign: 'center', fontSize: '1.8em', fontWeight: 'bold', textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}>All Cases</h2>
 
+      {/* Filter Buttons */}
       <div style={filterButtonsContainerStyles}>
         <button onClick={() => setFilterType('all')} style={filterButtonStyles(filterType === 'all')}> All Cases ({cases.length}) </button>
         <button onClick={() => setFilterType('paid')} style={filterButtonStyles(filterType === 'paid')}> Paid ({cases.filter(c => c.balanceRemaining <= 0).length}) </button>
         <button onClick={() => setFilterType('unpaid')} style={filterButtonStyles(filterType === 'unpaid')}> Unpaid ({cases.filter(c => c.balanceRemaining > 0).length}) </button>
       </div>
 
+      {/* Sort Controls */}
       <div style={sortControlsStyles}>
-        <span>Sort By: </span>
+        <span style={{color: COLORS.DARK_TEXT}}>Sort By: </span> {/* Text color */}
         <button onClick={() => handleSort('balanceRemaining')} style={sortButtonStyles}> Balance Remaining {sortBy === 'balanceRemaining' ? (sortOrder === 'asc' ? '▲' : '▼') : ''} </button>
         <button onClick={() => handleSort('dateCreated')} style={sortButtonStyles}> Date Created {sortBy === 'dateCreated' ? (sortOrder === 'asc' ? '▲' : '▼') : ''} </button>
       </div>
 
+      {/* Display Cases - Table or Message */}
       {displayedCases.length === 0 && (filterType !== 'all') ? (
         <p style={{textAlign: 'center', marginTop: '20px', color: COLORS.DARK_TEXT}}>{`No ${filterType} cases found matching your criteria.`}</p>
       ) : (
-        <div style={caseTableContainerStyles}> {/* NEW: Wrapper for horizontal scrolling */}
+        <div style={caseTableContainerStyles}> {/* Wrapper for horizontal scrolling */}
             <div style={caseTableStyles}>
               {/* Table Header */}
               <div style={tableHeaderRowStyles}>
@@ -506,10 +528,11 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
                 <div style={tableHeaderCellStyles}>Actions</div>
               </div>
 
-              {/* Table Rows with Details */}
+              {/* Table Rows with Collapsible Details */}
               {displayedCases.map((caseItem) => (
                 <React.Fragment key={caseItem.id}>
-                  <div style={tableRowStyles}>
+                  {/* Table Row - clickable to expand/collapse details */}
+                  <div style={tableRowStyles} onClick={() => toggleDetails(caseItem.id)}>
                     <div style={tableCellStyles}>{caseItem.caseTitle}</div>
                     <div style={tableCellStyles}>{caseItem.caseNumber}</div>
                     <div style={tableCellStyles}>{caseItem.court}</div>
@@ -521,138 +544,141 @@ export default function CaseList({ cases, onUpdateCase, onEditCase, onRemoveCase
                       </span>
                     </div>
                     <div style={tableCellStyles}>
-                      <button onClick={() => onEditCase(caseItem)} style={{ ...smallButtonStyles, backgroundColor: COLORS.WARNING, marginRight: '5px' }}> Edit </button>
-                      <button onClick={() => onRemoveCase(caseItem.id)} style={{ ...smallButtonStyles, backgroundColor: COLORS.DANGER }}> Remove </button>
+                      {/* Stop propagation for buttons inside clickable row */}
+                      <button onClick={(e) => { e.stopPropagation(); onEditCase(caseItem); }} style={{ ...smallButtonStyles, backgroundColor: COLORS.WARNING, marginRight: '5px' }}> Edit </button>
+                      <button onClick={(e) => { e.stopPropagation(); onRemoveCase(caseItem.id); }} style={{ ...smallButtonStyles, backgroundColor: COLORS.DANGER }}> Remove </button>
                     </div>
                   </div>
 
-                  {/* Details Card for Each Case - spans all columns */}
-                  <div style={{ ...caseDetailsCardStyles, border: '1px solid black' }}>
-                      <h3 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "0.5rem" }}>{caseItem.caseTitle} Details</h3>
-                      <p><strong>Initial Invoice:</strong> {caseItem.invoiceNumber} on {caseItem.invoiceDate} for ₹{caseItem.invoiceAmount.toLocaleString('en-IN')}</p>
-                      <p><strong>Remark (General):</strong> {caseItem.remark || 'N/A'}</p>
-                      <p><strong>Reference:</strong> {caseItem.reference || 'N/A'}</p>
-                      <p><strong>TDS Applicable:</strong> {caseItem.tdsApplicable ? 'Yes' : 'No'}</p>
-                      <p><strong>Date Created:</strong> {caseItem.dateCreated}</p>
+                  {/* Collapsible Details Card - Renders only if expandedCaseId matches */}
+                  {expandedCaseId === caseItem.id && (
+                    <div style={caseDetailsCardStyles}> {/* Corrected the border property here */}
+                        <h3 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "0.5rem" }}>{caseItem.caseTitle} Details</h3>
+                        <p><strong>Initial Invoice:</strong> {caseItem.invoiceNumber} on {caseItem.invoiceDate} for ₹{caseItem.invoiceAmount.toLocaleString('en-IN')}</p>
+                        <p><strong>Remark (General):</strong> {caseItem.remark || 'N/A'}</p>
+                        <p><strong>Reference:</strong> {caseItem.reference || 'N/A'}</p>
+                        <p><strong>TDS Applicable:</strong> {caseItem.tdsApplicable ? 'Yes' : 'No'}</p>
+                        <p><strong>Date Created:</strong> {caseItem.dateCreated}</p>
 
-                      <h4 style={{ color: COLORS.INFO, marginTop: "1rem", marginBottom: "0.5rem" }}>Installments Received:</h4>
-                      {(caseItem.installments || []).length === 0 ? ( <p>No installments recorded yet.</p> ) : (
-                        <ul style={installmentListStyles}>
-                          {(caseItem.installments || []).map((inst) => (
-                            <li key={inst.id} style={installmentItemStyles}>
-                              <div>Invoice: {inst.invoiceNumber} | Date: {inst.invoiceDate} | Amount: ₹{inst.amount.toLocaleString('en-IN')} | Method: {inst.paymentMethod}</div>
-                              <div style={{ marginTop: '5px' }}>
-                                <button onClick={() => handleEditInstallment(caseItem, inst)} style={{ ...smallButtonStyles, backgroundColor: COLORS.WARNING, marginRight: '5px' }}> Edit </button>
-                                <button onClick={() => handleRemoveInstallment(caseItem, inst.id)} style={{ ...smallButtonStyles, backgroundColor: COLORS.DANGER }}> Remove </button>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                        <h4 style={{ color: COLORS.INFO, marginTop: "1rem", marginBottom: "0.5rem" }}>Installments Received:</h4>
+                        {(caseItem.installments || []).length === 0 ? ( <p>No installments recorded yet.</p> ) : (
+                          <ul style={installmentListStyles}>
+                            {(caseItem.installments || []).map((inst) => (
+                              <li key={inst.id} style={installmentItemStyles}>
+                                <div>Invoice: {inst.invoiceNumber} | Date: {inst.invoiceDate} | Amount: ₹{inst.amount.toLocaleString('en-IN')} | Method: {inst.paymentMethod}</div>
+                                <div style={{ marginTop: '5px' }}>
+                                  <button onClick={(e) => { e.stopPropagation(); handleEditInstallment(caseItem, inst); }} style={{ ...smallButtonStyles, backgroundColor: COLORS.WARNING, marginRight: '5px' }}> Edit </button>
+                                  <button onClick={(e) => { e.stopPropagation(); handleRemoveInstallment(caseItem, inst.id); }} style={{ ...smallButtonStyles, backgroundColor: COLORS.DANGER }}> Remove </button>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
 
-                      <button onClick={() => { if (caseItem.id === showInstallmentForm) { handleCancelInstallmentForm(); } else { setShowInstallmentForm(caseItem.id); resetInstallmentForm(); } }}
-                        style={{ ...buttonStyles, backgroundColor: COLORS.SECONDARY_ACCENT, marginTop: "1rem" }}>
-                        {caseItem.id === showInstallmentForm && editingInstallmentId ? 'Cancel Edit' : caseItem.id === showInstallmentForm ? 'Cancel Add Installment' : 'Add Installment'}
-                      </button>
+                        <button onClick={(e) => { e.stopPropagation(); if (caseItem.id === showInstallmentForm) { handleCancelInstallmentForm(); } else { setShowInstallmentForm(caseItem.id); resetInstallmentForm(); } }}
+                          style={{ ...buttonStyles, backgroundColor: COLORS.SECONDARY_ACCENT, marginTop: "1rem" }}>
+                          {caseItem.id === showInstallmentForm && editingInstallmentId ? 'Cancel Edit' : caseItem.id === showInstallmentForm ? 'Cancel Add Installment' : 'Add Installment'}
+                        </button>
 
-                      {showInstallmentForm === caseItem.id && (
-                        <div style={installmentFormStyles}>
-                          <h5 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "1rem" }}>{editingInstallmentId ? 'Edit Installment' : 'Record New Payment'}</h5>
-                          <div style={inputGroupStyles}> <label style={labelStyles}>Invoice Number:</label> <input type="text" value={currentInstallmentInvoice} onChange={(e) => setCurrentInstallmentInvoice(e.target.value)} required style={inputStyles} /> </div>
-                          <div style={inputGroupStyles}> <label style={labelStyles}>Invoice Date:</label> <input type="date" value={currentInstallmentDate} onChange={(e) => setCurrentInstallmentDate(e.target.value)} required style={inputStyles} /> </div>
-                          <div style={inputGroupStyles}> <label style={labelStyles}>Amount (₹):</label> <input type="number" value={currentInstallmentAmount} onChange={(e) => setCurrentInstallmentAmount(Number(e.target.value))} required min="0" style={inputStyles} /> </div>
-                          <div style={inputGroupStyles}>
-                            <label style={labelStyles}>Payment Method:</label>
-                            <select value={currentInstallmentPaymentMethod} onChange={(e) => setCurrentInstallmentPaymentMethod(e.target.value)} style={selectStyles}>
-                              <option value="cash">Cash</option><option value="upi">UPI</option><option value="other">Other (Specify)</option>
-                            </select>
-                            {currentInstallmentPaymentMethod === 'other' && ( <input type="text" value={currentInstallmentCustomMethod} onChange={(e) => setCurrentInstallmentCustomMethod(e.target.value)} placeholder="Specify method" required style={inputStyles} /> )}
-                          </div>
-                          <button onClick={() => handleAddOrUpdateInstallment(caseItem)} style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, fontSize: "0.9em" }}> {editingInstallmentId ? 'Save Changes' : 'Record Payment'} </button>
-                          <button onClick={handleCancelInstallmentForm} style={{ ...buttonStyles, backgroundColor: COLORS.NEUTRAL_LIGHT, fontSize: '0.9em', marginTop: '10px' }}> Cancel </button>
-                        </div>
-                      )}
-
-                      {caseItem.perHearingFees && caseItem.perHearingFees > 0 ? (
-                        // Hearings Section
-                        <>
-                          <h4 style={{ color: COLORS.INFO, marginTop: "1rem", marginBottom: "0.5rem" }}> Hearings ({caseItem.hearings ? caseItem.hearings.length : 0}) </h4>
-                          {(caseItem.hearings || []).length === 0 ? ( <p>No hearings recorded yet.</p> ) : (
-                            <ul style={installmentListStyles}>
-                              {(caseItem.hearings || []).map((hearing) => (
-                                <li key={hearing.id} style={installmentItemStyles}>
-                                  <div>Date: {hearing.date} | Fees: ₹{hearing.feesCharged.toLocaleString('en-IN')} | Remark: {hearing.remark || 'N/A'}</div>
-                                  <div style={{ marginTop: '5px' }}>
-                                    <button onClick={() => handleEditHearing(caseItem, hearing)} style={{ ...smallButtonStyles, backgroundColor: COLORS.WARNING, marginRight: '5px' }}> Edit </button>
-                                    <button onClick={() => handleRemoveHearing(caseItem, hearing.id)} style={{ ...smallButtonStyles, backgroundColor: COLORS.DANGER }}> Remove </button>
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-
-                          <button onClick={() => { if (caseItem.id === showHearingForm) { handleCancelHearingForm(); } else { setShowHearingForm(caseItem.id); resetHearingForm(); setCurrentHearingDate(new Date().toISOString().split('T')[0]); setCurrentHearingRemark(''); } }}
-                            style={{ ...buttonStyles, backgroundColor: COLORS.SECONDARY_ACCENT, marginTop: "1rem" }}>
-                            {caseItem.id === showHearingForm && editingHearingId ? 'Cancel Edit' : caseItem.id === showHearingForm ? 'Cancel Add Hearing' : 'Add Hearing'}
-                          </button>
-
-                          {showHearingForm === caseItem.id && (
-                            <div style={installmentFormStyles}>
-                              <h5 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "1rem" }}>{editingHearingId ? 'Edit Hearing' : 'Add New Hearing'}</h5>
-                              <div style={inputGroupStyles}> <label style={labelStyles}>Hearing Date:</label> <input type="date" value={currentHearingDate} onChange={(e) => setCurrentHearingDate(e.target.value)} required style={inputStyles} /> </div>
-                              <div style={inputGroupStyles}> <label style={labelStyles}>Remark (for this hearing):</label> <textarea value={currentHearingRemark} onChange={(e) => setCurrentHearingRemark(e.target.value)} style={{ ...inputStyles, minHeight: '60px' }} placeholder="e.g., Case adjourned, Next date fixed, Arguments heard etc." /> </div>
-                              <button onClick={() => handleAddOrUpdateHearing(caseItem)} style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, fontSize: "0.9em" }}> {editingHearingId ? 'Save Changes' : 'Record Hearing'} </button>
-                              <button onClick={handleCancelHearingForm} style={{ ...buttonStyles, backgroundColor: COLORS.NEUTRAL_LIGHT, fontSize: '0.9em', marginTop: '10px' }}> Cancel </button>
+                        {showInstallmentForm === caseItem.id && (
+                          <div style={installmentFormStyles}>
+                            <h5 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "1rem" }}>{editingInstallmentId ? 'Edit Installment' : 'Record New Payment'}</h5>
+                            <div style={inputGroupStyles}> <label style={labelStyles}>Invoice Number:</label> <input type="text" value={currentInstallmentInvoice} onChange={(e) => setCurrentInstallmentInvoice(e.target.value)} required style={inputStyles} /> </div>
+                            <div style={inputGroupStyles}> <label style={labelStyles}>Invoice Date:</label> <input type="date" value={currentInstallmentDate} onChange={(e) => setCurrentInstallmentDate(e.target.value)} required style={inputStyles} /> </div>
+                            <div style={inputGroupStyles}> <label style={labelStyles}>Amount (₹):</label> <input type="number" value={currentInstallmentAmount} onChange={(e) => setCurrentInstallmentAmount(Number(e.target.value))} required min="0" style={inputStyles} /> </div>
+                            <div style={inputGroupStyles}>
+                              <label style={labelStyles}>Payment Method:</label>
+                              <select value={currentInstallmentPaymentMethod} onChange={(e) => setCurrentInstallmentPaymentMethod(e.target.value)} style={selectStyles}>
+                                <option value="cash">Cash</option><option value="upi">UPI</option><option value="other">Other (Specify)</option>
+                              </select>
+                              {currentInstallmentPaymentMethod === 'other' && ( <input type="text" value={currentInstallmentCustomMethod} onChange={(e) => setCurrentInstallmentCustomMethod(e.target.value)} placeholder="Specify method" required style={inputStyles} /> )}
                             </div>
-                          )}
-                        </>
-                  ) : (
-                    // Court Visits Section (if perHearingFees is 0 or undefined)
-                    <>
-                      <h4 style={{ color: COLORS.INFO, marginTop: "1rem", marginBottom: "0.5rem" }}> Court Visits ({caseItem.courtVisits ? caseItem.courtVisits.length : 0}) </h4>
-                      {(caseItem.courtVisits || []).length === 0 ? ( <p>No court visits recorded yet.</p> ) : (
-                        <ul style={installmentListStyles}>
-                          {(caseItem.courtVisits || []).map((visit) => (
-                            <li key={visit.id} style={installmentItemStyles}>
-                              <div>Date: {visit.date} | Remark: {visit.remark || 'N/A'}</div>
-                              <div style={{ marginTop: '5px' }}>
-                                <button onClick={() => handleEditCourtVisit(caseItem, visit)} style={{ ...smallButtonStyles, backgroundColor: COLORS.WARNING, marginRight: '5px' }}> Edit </button>
-                                <button onClick={() => handleRemoveCourtVisit(caseItem, visit.id)} style={{ ...smallButtonStyles, backgroundColor: COLORS.DANGER }}> Remove </button>
+                            <button onClick={(e) => { e.stopPropagation(); handleAddOrUpdateInstallment(caseItem); }} style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, fontSize: "0.9em" }}> {editingInstallmentId ? 'Save Changes' : 'Record Payment'} </button>
+                            <button onClick={(e) => { e.stopPropagation(); handleCancelInstallmentForm(); }} style={{ ...buttonStyles, backgroundColor: COLORS.NEUTRAL_LIGHT, fontSize: '0.9em', marginTop: '10px' }}> Cancel </button>
+                          </div>
+                        )}
+
+                        {caseItem.perHearingFees && caseItem.perHearingFees > 0 ? (
+                          // Hearings Section
+                          <>
+                            <h4 style={{ color: COLORS.INFO, marginTop: "1rem", marginBottom: "0.5rem" }}> Hearings ({caseItem.hearings ? caseItem.hearings.length : 0}) </h4>
+                            {(caseItem.hearings || []).length === 0 ? ( <p>No hearings recorded yet.</p> ) : (
+                              <ul style={installmentListStyles}>
+                                {(caseItem.hearings || []).map((hearing) => (
+                                  <li key={hearing.id} style={installmentItemStyles}>
+                                    <div>Date: {hearing.date} | Fees: ₹{hearing.feesCharged.toLocaleString('en-IN')} | Remark: {hearing.remark || 'N/A'}</div>
+                                    <div style={{ marginTop: '5px' }}>
+                                      <button onClick={(e) => { e.stopPropagation(); handleEditHearing(caseItem, hearing); }} style={{ ...smallButtonStyles, backgroundColor: COLORS.WARNING, marginRight: '5px' }}> Edit </button>
+                                      <button onClick={(e) => { e.stopPropagation(); handleRemoveHearing(caseItem, hearing.id); }} style={{ ...smallButtonStyles, backgroundColor: COLORS.DANGER }}> Remove </button>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+
+                            <button onClick={(e) => { e.stopPropagation(); if (caseItem.id === showHearingForm) { handleCancelHearingForm(); } else { setShowHearingForm(caseItem.id); resetHearingForm(); setCurrentHearingDate(new Date().toISOString().split('T')[0]); setCurrentHearingRemark(''); } }}
+                              style={{ ...buttonStyles, backgroundColor: COLORS.SECONDARY_ACCENT, marginTop: "1rem" }}>
+                              {caseItem.id === showHearingForm && editingHearingId ? 'Cancel Edit' : caseItem.id === showHearingForm ? 'Cancel Add Hearing' : 'Add Hearing'}
+                            </button>
+
+                            {showHearingForm === caseItem.id && (
+                              <div style={installmentFormStyles}>
+                                <h5 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "1rem" }}>{editingHearingId ? 'Edit Hearing' : 'Add New Hearing'}</h5>
+                                <div style={inputGroupStyles}> <label style={labelStyles}>Hearing Date:</label> <input type="date" value={currentHearingDate} onChange={(e) => setCurrentHearingDate(e.target.value)} required style={inputStyles} /> </div>
+                                <div style={inputGroupStyles}> <label style={labelStyles}>Remark (for this hearing):</label> <textarea value={currentHearingRemark} onChange={(e) => setCurrentHearingRemark(e.target.value)} style={{ ...inputStyles, minHeight: '60px' }} placeholder="e.g., Case adjourned, Next date fixed, Arguments heard etc." /> </div>
+                                <button onClick={(e) => { e.stopPropagation(); handleAddOrUpdateHearing(caseItem); }} style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, fontSize: "0.9em" }}> {editingHearingId ? 'Save Changes' : 'Record Hearing'} </button>
+                                <button onClick={(e) => { e.stopPropagation(); handleCancelHearingForm(); }} style={{ ...buttonStyles, backgroundColor: COLORS.NEUTRAL_LIGHT, fontSize: '0.9em', marginTop: '10px' }}> Cancel </button>
                               </div>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                            )}
+                          </>
+                    ) : (
+                      // Court Visits Section (if perHearingFees is 0 or undefined)
+                      <>
+                        <h4 style={{ color: COLORS.INFO, marginTop: "1rem", marginBottom: "0.5rem" }}> Court Visits ({caseItem.courtVisits ? caseItem.courtVisits.length : 0}) </h4>
+                        {(caseItem.courtVisits || []).length === 0 ? ( <p>No court visits recorded yet.</p> ) : (
+                          <ul style={installmentListStyles}>
+                            {(caseItem.courtVisits || []).map((visit) => (
+                              <li key={visit.id} style={installmentItemStyles}>
+                                <div>Date: {visit.date} | Remark: {visit.remark || 'N/A'}</div>
+                                <div style={{ marginTop: '5px' }}>
+                                  <button onClick={(e) => { e.stopPropagation(); handleEditCourtVisit(caseItem, visit); }} style={{ ...smallButtonStyles, backgroundColor: COLORS.WARNING, marginRight: '5px' }}> Edit </button>
+                                  <button onClick={(e) => { e.stopPropagation(); handleRemoveCourtVisit(caseItem, visit.id); }} style={{ ...smallButtonStyles, backgroundColor: COLORS.DANGER }}> Remove </button>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
 
-                      <button onClick={() => { if (caseItem.id === showCourtVisitForm) { handleCancelCourtVisitForm(); } else { setShowCourtVisitForm(caseItem.id); resetCourtVisitForm(); setCurrentCourtVisitDate(new Date().toISOString().split('T')[0]); setCurrentCourtVisitRemark(''); } }}
-                        style={{ ...buttonStyles, backgroundColor: COLORS.SECONDARY_ACCENT, marginTop: "1rem" }}>
-                        {caseItem.id === showCourtVisitForm && editingCourtVisitId ? 'Cancel Edit' : caseItem.id === showCourtVisitForm ? 'Cancel Add Visit' : 'Add Court Visit'}
+                        <button onClick={(e) => { e.stopPropagation(); if (caseItem.id === showCourtVisitForm) { handleCancelCourtVisitForm(); } else { setShowCourtVisitForm(caseItem.id); resetCourtVisitForm(); setCurrentCourtVisitDate(new Date().toISOString().split('T')[0]); setCurrentCourtVisitRemark(''); } }}
+                          style={{ ...buttonStyles, backgroundColor: COLORS.SECONDARY_ACCENT, marginTop: "1rem" }}>
+                          {caseItem.id === showCourtVisitForm && editingCourtVisitId ? 'Cancel Edit' : caseItem.id === showCourtVisitForm ? 'Cancel Add Visit' : 'Add Court Visit'}
+                        </button>
+
+                        {showCourtVisitForm === caseItem.id && (
+                          <div style={installmentFormStyles}>
+                            <h5 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "1rem" }}>{editingCourtVisitId ? 'Edit Court Visit' : 'Add New Court Visit'}</h5>
+                            <div style={inputGroupStyles}> <label style={labelStyles}>Visit Date:</label> <input type="date" value={currentCourtVisitDate} onChange={(e) => setCurrentCourtVisitDate(e.target.value)} required style={inputStyles} /> </div>
+                            <div style={inputGroupStyles}> <label style={labelStyles}>Remark (for this visit):</label> <textarea value={currentCourtVisitRemark} onChange={(e) => setCurrentCourtVisitRemark(e.target.value)} style={{ ...inputStyles, minHeight: '60px' }} placeholder="e.g., Filed documents, Case status check, Met with opposing counsel" /> </div>
+                            <button onClick={(e) => { e.stopPropagation(); handleAddOrUpdateCourtVisit(caseItem); }} style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, fontSize: "0.9em" }}> {editingCourtVisitId ? 'Save Changes' : 'Record Court Visit'} </button>
+                            <button onClick={(e) => { e.stopPropagation(); handleCancelCourtVisitForm(); }} style={{ ...buttonStyles, backgroundColor: COLORS.NEUTRAL_LIGHT, fontSize: '0.9em', marginTop: '10px' }}> Cancel </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {caseItem.balanceRemaining > 0 && (
+                      <button onClick={(e) => { e.stopPropagation(); alert(`Generate new invoice for remaining balance: ₹${caseItem.balanceRemaining.toLocaleString('en-IN')}`); }}
+                        style={{ ...buttonStyles, backgroundColor: COLORS.INFO, marginTop: "1rem", fontSize: "0.9em" }}>
+                        Generate Invoice for Balance
                       </button>
-
-                      {showCourtVisitForm === caseItem.id && (
-                        <div style={installmentFormStyles}>
-                          <h5 style={{ color: COLORS.PRIMARY_ACCENT, marginBottom: "1rem" }}>{editingCourtVisitId ? 'Edit Court Visit' : 'Add New Court Visit'}</h5>
-                          <div style={inputGroupStyles}> <label style={labelStyles}>Visit Date:</label> <input type="date" value={currentCourtVisitDate} onChange={(e) => setCurrentCourtVisitDate(e.target.value)} required style={inputStyles} /> </div>
-                          <div style={inputGroupStyles}> <label style={labelStyles}>Remark (for this visit):</label> <textarea value={currentCourtVisitRemark} onChange={(e) => setCurrentCourtVisitRemark(e.target.value)} style={{ ...inputStyles, minHeight: '60px' }} placeholder="e.g., Filed documents, Case status check, Met with opposing counsel" /> </div>
-                          <button onClick={() => handleAddOrUpdateCourtVisit(caseItem)} style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, fontSize: "0.9em" }}> {editingCourtVisitId ? 'Save Changes' : 'Record Court Visit'} </button>
-                          <button onClick={handleCancelCourtVisitForm} style={{ ...buttonStyles, backgroundColor: COLORS.NEUTRAL_LIGHT, fontSize: '0.9em', marginTop: '10px' }}> Cancel </button>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {caseItem.balanceRemaining > 0 && (
-                    <button onClick={() => alert(`Generate new invoice for remaining balance: ₹${caseItem.balanceRemaining.toLocaleString('en-IN')}`)}
-                      style={{ ...buttonStyles, backgroundColor: COLORS.INFO, marginTop: "1rem", fontSize: "0.9em" }}>
-                      Generate Invoice for Balance
-                    </button>
-                  )}
-              </div>
+                    )}
+                </div> // <-- This is the problematic closing div
+              )}
             </React.Fragment>
           ))}
-        </div>
+        </div> {/* Closing div for caseTableStyles */}
       </div>
-      )}
+      )} 
     </div>
   );
 }
@@ -665,12 +691,12 @@ const listContainerStyles: React.CSSProperties = {
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   padding: "2rem",
   borderRadius: "8px",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+  boxShadow: `0 4px 10px ${COLORS.SHADOW_DARK}`, // Added box shadow
   maxWidth: "1200px", // Increased max-width for the main table container
   margin: "2rem auto",
   color: COLORS.DARK_TEXT,
   width: "calc(100% - 4rem)",
-  border: '1px solid black',
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
 };
 
 const filterButtonsContainerStyles: React.CSSProperties = {
@@ -685,7 +711,7 @@ const filterButtonStyles = (isActive: boolean): React.CSSProperties => ({
   padding: '10px 15px', // Slightly less padding for mobile fit
   backgroundColor: isActive ? COLORS.PRIMARY_ACCENT : COLORS.NEUTRAL_LIGHT,
   color: isActive ? COLORS.DARK_TEXT : COLORS.LIGHT_TEXT,
-  border: '1px solid black', // Added border for visibility
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Added border for visibility
   borderRadius: "5px",
   cursor: "pointer",
   fontSize: '0.9em', // Slightly smaller font
@@ -693,14 +719,16 @@ const filterButtonStyles = (isActive: boolean): React.CSSProperties => ({
   flex: '1 1 auto', // Allow flex items to grow/shrink based on content/space
   minWidth: '90px', // Minimum width for each button
   boxSizing: 'border-box', // Include padding and border in width calculation
+  boxShadow: `0 1px 3px ${COLORS.SHADOW_COLOR}`, // Added box shadow
 });
 
 const caseTableContainerStyles: React.CSSProperties = { // Wrapper for horizontal scroll
   width: '100%',
   overflowX: 'auto', // Enable horizontal scrolling
-  border: '1px solid black', // Border around the scrollable table
-  borderRadius: '8px',
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+  borderRadius: "8px",
   marginBottom: '1.5rem', // Space below the table itself
+  boxShadow: `0 4px 10px ${COLORS.SHADOW_DARK}`, // Added box shadow
 };
 
 const caseTableStyles: React.CSSProperties = {
@@ -708,7 +736,7 @@ const caseTableStyles: React.CSSProperties = {
   gridTemplateColumns: 'repeat(7, minmax(120px, 1fr))', // Increased minmax for better column width on desktop
   // On mobile, these minmax will push it beyond screen width, triggering overflow-x:auto
   gap: '1px',
-  backgroundColor: 'black', // Border color for grid lines
+  backgroundColor: 'black', // Border color for grid lines (use a color from palette)
   // borderRadius: '8px', // Already on parent, no need here
   // overflow: 'hidden', // Already on parent
   minWidth: '700px', // Ensure the grid has a minimum width to always trigger scroll on small screens
@@ -725,8 +753,8 @@ const tableHeaderRowStyles: React.CSSProperties = {
 const tableHeaderCellStyles: React.CSSProperties = {
   padding: '12px 10px',
   textAlign: 'left',
-  borderRight: '1px solid black', // Black border
-  borderBottom: '1px solid black', // Black border
+  borderRight: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+  borderBottom: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
   backgroundColor: COLORS.PRIMARY_DARK,
   whiteSpace: 'nowrap',
 };
@@ -734,12 +762,13 @@ const tableHeaderCellStyles: React.CSSProperties = {
 const tableRowStyles: React.CSSProperties = {
   display: 'contents', // Allows children to be direct grid items
   backgroundColor: COLORS.LIGHT_BACKGROUND,
+  cursor: 'pointer', // Indicate clickable row
 };
 
 const tableCellStyles: React.CSSProperties = {
   padding: '10px',
-  borderRight: '1px solid black', // Black border
-  borderBottom: '1px solid black', // Black border
+  borderRight: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+  borderBottom: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   wordBreak: 'break-word',
   fontSize: '0.9em',
@@ -752,12 +781,13 @@ const caseDetailsCardStyles: React.CSSProperties = {
   gridColumn: '1 / -1',
   backgroundColor: COLORS.LIGHT_BACKGROUND, // Same as table row for continuity
   padding: "1.5rem",
+  borderTop: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
   marginBottom: "1.5rem",
   borderRadius: "0 0 8px 8px",
-  border: '1px solid black', // Black border around the details card itself
-  borderTop: 'none', // Remove top border if it's supposed to be continuous with the row
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
   boxSizing: 'border-box',
   color: COLORS.DARK_TEXT,
+  boxShadow: `0 4px 8px ${COLORS.SHADOW_COLOR}`, // Added box shadow
 };
 
 
@@ -769,7 +799,8 @@ const emptyListStyles: React.CSSProperties = {
   color: COLORS.DARK_TEXT,
   maxWidth: "600px",
   margin: "2rem auto",
-  border: '1px solid black',
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+  boxShadow: `0 4px 12px ${COLORS.SHADOW_DARK}` // Subtle box shadow
 };
 
 const sortControlsStyles: React.CSSProperties = {
@@ -785,13 +816,14 @@ const sortButtonStyles: React.CSSProperties = {
   padding: '8px 12px',
   backgroundColor: COLORS.SECONDARY_ACCENT,
   color: COLORS.LIGHT_TEXT,
-  border: '1px solid black',
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
   borderRadius: "5px",
   cursor: "pointer",
   fontSize: '0.85em',
   flex: '1 1 auto',
   minWidth: '80px',
   boxSizing: 'border-box',
+  boxShadow: `0 1px 3px ${COLORS.SHADOW_COLOR}`, // Added box shadow
 };
 
 const installmentListStyles: React.CSSProperties = {
@@ -812,7 +844,8 @@ const installmentItemStyles: React.CSSProperties = {
   flexWrap: 'wrap',
   gap: '10px',
   color: COLORS.LIGHT_TEXT,
-  border: '1px solid black',
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+  boxShadow: `0 1px 3px ${COLORS.SHADOW_COLOR}`, // Added box shadow
 };
 
 const installmentFormStyles: React.CSSProperties = {
@@ -820,8 +853,9 @@ const installmentFormStyles: React.CSSProperties = {
   padding: "1rem",
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   borderRadius: "8px",
-  border: `1px dashed ${COLORS.INFO}`,
   color: COLORS.DARK_TEXT,
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
+  boxShadow: `0 4px 8px ${COLORS.SHADOW_COLOR}`, // Added box shadow
 };
 
 const inputGroupStyles: React.CSSProperties = {
@@ -840,7 +874,7 @@ const labelStyles: React.CSSProperties = {
 const inputStyles: React.CSSProperties = {
   padding: "8px",
   borderRadius: "4px",
-  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`,
+  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Consistent thin border
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   color: COLORS.DARK_TEXT,
   fontSize: "0.9em",
@@ -849,7 +883,7 @@ const inputStyles: React.CSSProperties = {
 const selectStyles: React.CSSProperties = {
   padding: "8px",
   borderRadius: "4px",
-  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`,
+  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Consistent thin border
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   color: COLORS.DARK_TEXT,
   fontSize: "0.9em",

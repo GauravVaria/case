@@ -14,7 +14,11 @@ export const COLORS = {
   DANGER: '#E57373',           // Red for danger/unpaid/remove
   WARNING: '#FFB300',          // Orange/Yellow for warnings/edits
   INFO: '#5D7F9B',             // Info color, can reuse secondary accent
-  NEUTRAL_DARK: '#2C2F3A',     // Dark gray for general backgrounds/divs
-  NEUTRAL_MEDIUM: '#4A4F5B',   // Medium gray for borders/separators
+  NEUTRAL_DARK: '#2C2F3A',     // Dark gray for general backgrounds/divs - Used for main borders
+  NEUTRAL_MEDIUM: '#4A4F5B',   // Medium gray for input borders/separators
   NEUTRAL_LIGHT: '#6C757D',    // Lighter gray for subtle elements
+
+  // Shadow Colors (add these back)
+  SHADOW_COLOR: 'rgba(0, 0, 0, 0.15)', // A light black for subtle shadows
+  SHADOW_DARK: 'rgba(0, 0, 0, 0.3)',   // A darker shadow for more depth
 };

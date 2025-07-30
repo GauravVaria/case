@@ -147,37 +147,37 @@ export default function HomePage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: 'transparent' }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}> {/* Main page wrapper. Has no background itself, allowing body background to show */}
       <Header />
 
       <main
         style={{
           flexGrow: 1,
           padding: "20px",
-          backgroundColor: COLORS.LIGHT_BACKGROUND,
+          backgroundColor: COLORS.LIGHT_BACKGROUND, // Main content background
           color: COLORS.DARK_TEXT,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: "30px",
-          border: '1px solid black',
+          border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Consistent thin border
           borderRadius: '8px',
-          margin: '20px auto',
-          maxWidth: '1200px',
-          width: 'calc(100% - 40px)',
+          boxShadow: `0 4px 10px ${COLORS.SHADOW_DARK}`, // Added box shadow
+          margin: '20px auto', // Auto horizontal margin centers it, showing black on sides
+          maxWidth: '1200px', // Limits max width
+          width: 'calc(100% - 40px)', // Fluid width for responsiveness
           boxSizing: 'border-box',
         }}
       >
-        {/* Styled heading */}
         <h1 style={{
-          color: "black",
+          color: COLORS.PRIMARY_DARK,
           textAlign: "center",
           marginBottom: "1.5rem",
           fontSize: '2.5em',       // Increased font size
           fontWeight: 'bold',      // Bold font weight
           letterSpacing: '0.05em', // Added letter spacing
           textShadow: '2px 2px 4px rgba(0,0,0,0.2)', // Subtle shadow
-          fontFamily: 'Times New Roman, serif', // More professional font
+          fontFamily: 'Georgia, serif', // More professional font
           textTransform: 'uppercase', // Uppercase for impact
         }}>
           Case Management Dashboard
@@ -191,7 +191,7 @@ export default function HomePage() {
                         setShowCaseForm(true);
                         setCaseToEdit(undefined);
                     }}
-                    style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, width: 'auto', marginTop: 0, marginBottom: 0 }}
+                    style={{ ...buttonStyles, backgroundColor: COLORS.SUCCESS, width: 'auto', marginTop: 0, marginBottom: 0, boxShadow: `0 2px 5px ${COLORS.SHADOW_COLOR}` }}
                 >
                     Add New Case
                 </button>
@@ -220,7 +220,7 @@ export default function HomePage() {
 
             {showCaseForm && (
                 <div style={modalOverlayStyles}>
-                    <div style={{ ...modalContentStyles, border: '1px solid black' }}>
+                    <div style={{ ...modalContentStyles, border: `1px solid ${COLORS.NEUTRAL_DARK}` }}> {/* Consistent thin border */}
                         <CaseForm
                             onAddCase={handleAddCase}
                             onUpdateCase={handleUpdateCase}
@@ -241,7 +241,7 @@ export default function HomePage() {
             )}
           </>
         ) : (
-          <div style={{ textAlign: "center", marginTop: "50px", border: '1px solid black', padding: '20px', borderRadius: '8px', backgroundColor: COLORS.LIGHT_BACKGROUND, maxWidth: '90%', width: 'calc(100% - 40px)' }}>
+          <div style={{ textAlign: "center", marginTop: "50px", border: `1px solid ${COLORS.NEUTRAL_DARK}`, padding: '20px', borderRadius: '8px', backgroundColor: COLORS.LIGHT_BACKGROUND, maxWidth: '90%', width: 'calc(100% - 40px)', boxShadow: `0 4px 10px ${COLORS.SHADOW_DARK}` }}> {/* Consistent thin border and shadow */}
             <p style={{ color: COLORS.DARK_TEXT }}>Please sign in with your Google account to access the Case Management System.</p>
             <button
               onClick={() => signIn("google")}
@@ -261,10 +261,6 @@ export default function HomePage() {
           </div>
         )}
       </main>
-
-      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: 'black', color: COLORS.LIGHT_TEXT, borderTop: '1px solid black' }}>
-        &copy; {new Date().getFullYear()} Lawyer&apos;s Case Tracker
-      </footer>
     </div>
   );
 }
@@ -298,7 +294,7 @@ const modalContentStyles: React.CSSProperties = {
   borderRadius: '8px',
   maxHeight: '90vh',
   overflowY: 'auto',
-  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
+  boxShadow: `0 8px 16px ${COLORS.SHADOW_DARK}`, // Softened shadow
   width: 'calc(100% - 4rem)',
   maxWidth: '900px', // Stays wide for desktop
 };

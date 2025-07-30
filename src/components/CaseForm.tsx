@@ -359,13 +359,13 @@ const formContainerStyles: React.CSSProperties = {
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   padding: "2rem",
   borderRadius: "8px",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+  border: `1px solid ${COLORS.NEUTRAL_DARK}`, // Thin border
+  boxShadow: `0 4px 10px ${COLORS.SHADOW_DARK}`, // Added box shadow
   maxWidth: "900px",
   margin: "2rem auto",
   color: COLORS.DARK_TEXT,
   width: "calc(100% - 4rem)",
   boxSizing: 'border-box',
-  border: '1px solid black', // Added border
 };
 
 const twoColumnLayoutStyles: React.CSSProperties = {
@@ -379,15 +379,10 @@ const responsiveInputGroupStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: "8px",
-  // Adjusted flex-basis to allow stacking on smaller screens (below 600px breakpoint for example)
   flex: "1 1 100%", // Default to full width for mobile-first approach
-  // Using a media query or a dynamic check to enable 50% for larger screens
-  // For now, setting a min-width to trigger wrap or just let it expand
   minWidth: "250px", // Allows items to shrink down to 250px before wrapping
   boxSizing: "border-box",
   marginBottom: '0',
-  // You would typically use a CSS media query for 50% width:
-  // @media (min-width: 600px) { flex: "1 1 calc(50% - 10px)" }
 };
 
 const inputGroupStyles: React.CSSProperties = {
@@ -406,7 +401,7 @@ const labelStyles: React.CSSProperties = {
 const inputStyles: React.CSSProperties = {
   padding: "10px",
   borderRadius: "4px",
-  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`,
+  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Thin border
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   color: COLORS.DARK_TEXT,
   fontSize: "1em",
@@ -417,7 +412,7 @@ const inputStyles: React.CSSProperties = {
 const selectStyles: React.CSSProperties = {
   padding: "10px",
   borderRadius: "4px",
-  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`,
+  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Thin border
   backgroundColor: COLORS.LIGHT_BACKGROUND,
   color: COLORS.DARK_TEXT,
   fontSize: "1em",
@@ -434,6 +429,7 @@ const buttonStyles: React.CSSProperties = {
   borderRadius: "5px",
   cursor: "pointer",
   fontSize: "1.1em",
+  boxShadow: `0 2px 5px ${COLORS.SHADOW_COLOR}`, // Added box shadow
 };
 
 const formButtonRowStyles: React.CSSProperties = {
