@@ -356,13 +356,13 @@ export default function CaseForm({ onAddCase, onUpdateCase, initialCase, onCance
 // =======================================================
 
 const formContainerStyles: React.CSSProperties = {
-  backgroundColor: COLORS.LIGHT_BACKGROUND, // Form background
+  backgroundColor: COLORS.LIGHT_BACKGROUND,
   padding: "2rem",
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
   maxWidth: "900px",
   margin: "2rem auto",
-  color: COLORS.DARK_TEXT, // Form text color
+  color: COLORS.DARK_TEXT,
   width: "calc(100% - 4rem)",
   boxSizing: 'border-box',
   border: '1px solid black', // Added border
@@ -379,10 +379,15 @@ const responsiveInputGroupStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: "8px",
-  flex: "1 1 calc(50% - 10px)",
-  minWidth: "250px",
+  // Adjusted flex-basis to allow stacking on smaller screens (below 600px breakpoint for example)
+  flex: "1 1 100%", // Default to full width for mobile-first approach
+  // Using a media query or a dynamic check to enable 50% for larger screens
+  // For now, setting a min-width to trigger wrap or just let it expand
+  minWidth: "250px", // Allows items to shrink down to 250px before wrapping
   boxSizing: "border-box",
   marginBottom: '0',
+  // You would typically use a CSS media query for 50% width:
+  // @media (min-width: 600px) { flex: "1 1 calc(50% - 10px)" }
 };
 
 const inputGroupStyles: React.CSSProperties = {
@@ -394,16 +399,16 @@ const inputGroupStyles: React.CSSProperties = {
 
 const labelStyles: React.CSSProperties = {
   fontWeight: "bold",
-  color: COLORS.PRIMARY_DARK, // Label color
+  color: COLORS.PRIMARY_DARK,
   marginBottom: "5px",
 };
 
 const inputStyles: React.CSSProperties = {
   padding: "10px",
   borderRadius: "4px",
-  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Border color
-  backgroundColor: COLORS.LIGHT_BACKGROUND, // Input background
-  color: COLORS.DARK_TEXT, // Input text color
+  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`,
+  backgroundColor: COLORS.LIGHT_BACKGROUND,
+  color: COLORS.DARK_TEXT,
   fontSize: "1em",
   width: '100%',
   boxSizing: 'border-box',
@@ -412,9 +417,9 @@ const inputStyles: React.CSSProperties = {
 const selectStyles: React.CSSProperties = {
   padding: "10px",
   borderRadius: "4px",
-  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`, // Border color
-  backgroundColor: COLORS.LIGHT_BACKGROUND, // Select background
-  color: COLORS.DARK_TEXT, // Select text color
+  border: `1px solid ${COLORS.NEUTRAL_MEDIUM}`,
+  backgroundColor: COLORS.LIGHT_BACKGROUND,
+  color: COLORS.DARK_TEXT,
   fontSize: "1em",
   cursor: "pointer",
   width: '100%',
@@ -423,7 +428,7 @@ const selectStyles: React.CSSProperties = {
 
 const buttonStyles: React.CSSProperties = {
   padding: "12px 25px",
-  backgroundColor: COLORS.PRIMARY_ACCENT, // Default button style
+  backgroundColor: COLORS.PRIMARY_ACCENT,
   color: COLORS.LIGHT_TEXT,
   border: "none",
   borderRadius: "5px",

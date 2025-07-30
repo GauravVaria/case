@@ -147,14 +147,14 @@ export default function HomePage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: 'transparent' }}>
       <Header />
 
       <main
         style={{
           flexGrow: 1,
           padding: "20px",
-          backgroundColor: COLORS.LIGHT_BACKGROUND, // Main content background is already this color
+          backgroundColor: COLORS.LIGHT_BACKGROUND,
           color: COLORS.DARK_TEXT,
           display: "flex",
           flexDirection: "column",
@@ -168,7 +168,18 @@ export default function HomePage() {
           boxSizing: 'border-box',
         }}
       >
-        <h1 style={{ color: COLORS.PRIMARY_DARK, textAlign: "center", marginBottom: "1.5rem" }}>
+        {/* Styled heading */}
+        <h1 style={{
+          color: "black",
+          textAlign: "center",
+          marginBottom: "1.5rem",
+          fontSize: '2.5em',       // Increased font size
+          fontWeight: 'bold',      // Bold font weight
+          letterSpacing: '0.05em', // Added letter spacing
+          textShadow: '2px 2px 4px rgba(0,0,0,0.2)', // Subtle shadow
+          fontFamily: 'Times New Roman, serif', // More professional font
+          textTransform: 'uppercase', // Uppercase for impact
+        }}>
           Case Management Dashboard
         </h1>
 
@@ -230,7 +241,7 @@ export default function HomePage() {
             )}
           </>
         ) : (
-          <div style={{ textAlign: "center", marginTop: "50px", border: '1px solid black', padding: '20px', borderRadius: '8px', backgroundColor: COLORS.LIGHT_BACKGROUND, maxWidth: '600px' }}>
+          <div style={{ textAlign: "center", marginTop: "50px", border: '1px solid black', padding: '20px', borderRadius: '8px', backgroundColor: COLORS.LIGHT_BACKGROUND, maxWidth: '90%', width: 'calc(100% - 40px)' }}>
             <p style={{ color: COLORS.DARK_TEXT }}>Please sign in with your Google account to access the Case Management System.</p>
             <button
               onClick={() => signIn("google")}
@@ -251,8 +262,8 @@ export default function HomePage() {
         )}
       </main>
 
-      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: COLORS.LIGHT_BACKGROUND, color: COLORS.DARK_TEXT, borderTop: '1px solid black' }}> {/* Changed to LIGHT_BACKGROUND and DARK_TEXT */}
-        &copy; {new Date().getFullYear()} Case Management System
+      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: 'black', color: COLORS.LIGHT_TEXT, borderTop: '1px solid black' }}>
+        &copy; {new Date().getFullYear()} Lawyer&apos;s Case Tracker
       </footer>
     </div>
   );
@@ -264,7 +275,7 @@ const topControlsContainerStyles: React.CSSProperties = {
     marginBottom: '20px',
     justifyContent: 'center',
     width: '100%',
-    maxWidth: '1200px',
+    maxWidth: '1200px', // Stays wide for desktop
     flexWrap: 'wrap',
 };
 
@@ -289,7 +300,7 @@ const modalContentStyles: React.CSSProperties = {
   overflowY: 'auto',
   boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
   width: 'calc(100% - 4rem)',
-  maxWidth: '900px',
+  maxWidth: '900px', // Stays wide for desktop
 };
 
 const buttonStyles: React.CSSProperties = {
